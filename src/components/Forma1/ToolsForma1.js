@@ -29,7 +29,7 @@ export default function ToolsBildirgilar({
         {/* <Button color="secondary" variant="contained">
           <img src={ExcelSvg} style={{ height: 25 }} /> Excelga
         </Button> */}
-        <CreateForma1 />
+        <CreateForma1 fetchData={fetchData} />
         <ImportForm1 />
         <Button variant="contained" onClick={fetchData}>
           <CachedIcon />

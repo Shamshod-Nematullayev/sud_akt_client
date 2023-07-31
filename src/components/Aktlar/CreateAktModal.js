@@ -26,6 +26,8 @@ function CreateAktModal({ getDatas, pachka_id }) {
         pachka_id,
       });
       if (respond.data.ok) {
+        const btn = document.querySelector(".btn-close");
+        btn.click();
         getDatas();
       } else {
         toast.error(respond.data.message);

@@ -143,6 +143,24 @@ function Aktlar() {
         });
     });
   };
+  // To'lov qilgan tugmasini bosilsa
+  const fetchTolovQildi = async () => {
+    checked.forEach(async (_id) => {
+      await axios
+        .put(`${API.sudAkts}/${_id}`, {
+          status: "TO'LOV QILGAN",
+        })
+        .then((respond) => {
+          console.log(respond.data);
+          if (respond.data.ok) {
+            toast.done("Yangilandi");
+          } else {
+            toast.error(respond.data.message);
+          }
+          fetchData();
+        });
+    });
+  };
 
   return (
     <div className="admin-page">
@@ -166,6 +184,8 @@ function Aktlar() {
           <Tools
             fetchData={fetchData}
             fetchSudBuyrugiChiqorilgan={fetchSudBuyrugiChiqorilgan}
+            fetchTolovQildi={fetchTolovQildi}
+            datas={rows}
           />
 
           {/* Data Table */}

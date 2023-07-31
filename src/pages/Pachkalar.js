@@ -32,12 +32,16 @@ export default function Pachkalar() {
       headerName: "Aktlar soni",
       width: "100",
     },
+    {
+      field: "sended_sud_time",
+      headerName: "Sudga yuborilish sanasi",
+      width: "200",
+    },
   ];
   const fetchData = async () => {
     setShowBackrop(true);
     const respond = await axios.get(API.pachkalar);
     let m = respond.data.pachkalar.map((data, i) => {
-      console.log(data);
       return {
         id: i + 1,
         name: data.name,
@@ -46,6 +50,7 @@ export default function Pachkalar() {
         sended_sud: data.sended_sud,
         _id: data._id,
         elemnts_count: data.elements.length,
+        sended_sud_time: data.sended_sud_time,
       };
     });
     setShowBackrop(false);

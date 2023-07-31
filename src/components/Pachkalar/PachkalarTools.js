@@ -15,6 +15,7 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import SendIcon from "@mui/icons-material/Send";
 
 function ToolsPachkalar({
   handleChecked,
@@ -111,6 +112,13 @@ function ToolsPachkalar({
     setValues({ name: pachka.name, description: pachka.description });
     setOpenEdit(true);
   };
+  const sudgaYuborish = async () => {
+    await axios.get(API.pachkalar + checked + "/sudgaYuborish/").then((res) => {
+      if (res.data.ok) {
+        toast.success(res.data.message);
+      }
+    });
+  };
   return (
     <ul>
       <div className="accordion actions-panel">
@@ -179,6 +187,9 @@ function ToolsPachkalar({
         >
           <AddIcon /> Yaratish
         </Button>
+        <Button variant="contained" onClick={sudgaYuborish}>
+          Sudga yuborish <SendIcon />
+        </Button>
         <Button
           color="warning"
           variant="contained"
@@ -213,7 +224,7 @@ function ToolsPachkalar({
           >
             <NavigateNextIcon /> O'tish
           </Link>
-        </Button>{" "}
+        </Button>
       </div>
     </ul>
     // Excel file import ogohlantirilganlar

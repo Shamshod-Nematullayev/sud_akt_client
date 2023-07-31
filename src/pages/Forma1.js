@@ -52,7 +52,7 @@ export default function Forma1() {
             <a
               onClick={(e) => {
                 console.log(params);
-                onLoadFile(params.row.file_id);
+                onLoadFile(params.row.file_id, params.row.file_name);
               }}
             >
               <FileDownloadIcon className="mx-2" />
@@ -79,6 +79,7 @@ export default function Forma1() {
           date: data.createdAt,
           status: data.confirm,
           actions: [data.file_link, data._id],
+          file_name: data.file_name,
         };
       }
     });
@@ -105,7 +106,7 @@ export default function Forma1() {
     );
   };
 
-  const onLoadFile = (file_id) => {
+  const onLoadFile = (file_id, file_name) => {
     axios
       .get(API.fetchTelegramLoadFile + file_id, { responseType: "blob" })
       .then((res) => {
@@ -116,7 +117,7 @@ export default function Forma1() {
         } else if (res.data.type == "application/pdf") {
           ex = "pdf";
         }
-        fileDownload(res.data, "review." + ex);
+        fileDownload(res.data, file_name ? file_name : "review." + ex);
       });
   };
 

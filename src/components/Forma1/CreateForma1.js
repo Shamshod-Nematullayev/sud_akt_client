@@ -12,6 +12,7 @@ import AddIcon from "@mui/icons-material/Add";
 export default function CreateForma1({ fetchData }) {
   const [open, setOpen] = React.useState(false);
   const [excelFile, setExcelFile] = React.useState(null);
+  const [file_name, setFileName] = React.useState("");
   const [kod, setKod] = React.useState("");
 
   const handleClickOpen = () => {
@@ -21,23 +22,6 @@ export default function CreateForma1({ fetchData }) {
   const handleClose = () => {
     setOpen(false);
   };
-  const handleChange = (e) => {
-    const fileTypes = [
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    ];
-    const selectedFile = e.target.files[0];
-    if (selectedFile && fileTypes.includes(selectedFile.type)) {
-      let reader = new FileReader();
-      reader.readAsArrayBuffer(selectedFile);
-      reader.onload = (e) => {
-        setExcelFile(e.target.result);
-      };
-    } else {
-      toast.error("Faqat excel file kiriting");
-      return false;
-    }
-  };
 
   const handleSubmit = async (e) => {
     const formData = new FormData();
@@ -45,7 +29,7 @@ export default function CreateForma1({ fetchData }) {
     e.preventDefault();
     const res = await axios.post(
       forma1lar,
-      { file: excelFile, kod, type: "forma1" },
+      { file: excelFile, kod, file_name, type: "forma1" },
       {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -55,7 +39,9 @@ export default function CreateForma1({ fetchData }) {
     if (!res.data.ok) {
       toast.error(res.data.message);
     } else {
+      handleClose();
       toast.success(res.data.message);
+      fetchData();
     }
     // if (excelFile !== null) {
     //   const workbook = XLSX.read(excelFile, { type: "buffer" });
@@ -79,12 +65,6 @@ export default function CreateForma1({ fetchData }) {
     //     toast.error(error.message);
     //   }
     // }
-  };
-  const onDownload = () => {
-    const link = document.createElement("a");
-    link.download = `example.xlsx`;
-    link.href = "./examples/ogohlantirilgan.xlsx";
-    link.click();
   };
 
   return (
@@ -119,6 +99,7 @@ export default function CreateForma1({ fetchData }) {
               accept="image/png, image/jpeg, .pdf"
               onChange={(e) => {
                 setExcelFile(e.target.files[0]);
+                setFileName(e.target.files[0].name);
               }}
             />
           </DialogContent>

@@ -4,15 +4,36 @@ import { show } from "../../app/reducers/showHideSlice";
 import ExcelSvg from "../../assets/excel.svg";
 import { Button } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
-import SendIcon from "@mui/icons-material/Send";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 import axios from "axios";
 import API from "../../utils/APIRouters";
+import { CSVLink } from "react-csv";
+import { useState } from "react";
 
-function Tools({ fetchData, fetchSudBuyrugiChiqorilgan }) {
-  function handleSudBuyrugiChiqorilgan() {
-    axios.put(API.sudAkts, {});
-  }
+function Tools({
+  fetchData,
+  fetchSudBuyrugiChiqorilgan,
+  datas,
+  fetchTolovQildi,
+}) {
+  // data for excel
+  const formatData = () => {
+    const arr = [];
+    datas.forEach((data) => {
+      arr.push({
+        tr: data.id,
+        kod: data.kod,
+        fish: data.fish,
+        ogohlantirish: data.ogohlantirish_xati,
+        forma1: data.forma1.topildi ? "aniqlandi" : "noaniq",
+        _id: data._id,
+        status: data.status,
+        qarzdorlik: data.qarzdorlik,
+      });
+    });
+    return arr;
+  };
+
   const dispatch = useDispatch();
   return (
     <ul>
@@ -62,16 +83,21 @@ function Tools({ fetchData, fetchSudBuyrugiChiqorilgan }) {
           </div>
         </div>
         <button className="btn btn-secondary excel-btn">
-          <img src={ExcelSvg} style={{ height: 25 }} /> Excelga
+          <CSVLink
+            data={formatData()}
+            style={{ textDecoration: "none", color: "#fff" }}
+          >
+            <img src={ExcelSvg} style={{ height: 25 }} /> Excelga
+          </CSVLink>
         </button>
         <Button variant="contained" onClick={fetchData}>
           <CachedIcon />
         </Button>
-        <Button variant="contained" onClick={fetchData}>
-          Sudga yuborish <SendIcon />
-        </Button>
         <Button variant="contained" onClick={fetchSudBuyrugiChiqorilgan}>
           Sud buyrug'i chiqorilgan <DoneOutlineIcon />
+        </Button>
+        <Button variant="contained" onClick={fetchTolovQildi}>
+          To'lov qildi <DoneOutlineIcon />
         </Button>
       </div>
     </ul>
