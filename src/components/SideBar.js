@@ -8,6 +8,7 @@ function SideBar({ active }) {
     forma1: "link-body-emphasis",
     dalolatnomalar: "link-body-emphasis",
     bildirgilar: "link-body-emphasis",
+    documents: "link-body-emphasis",
   });
 
   useEffect(() => {
@@ -61,6 +62,14 @@ function SideBar({ active }) {
             className={`nav-link  ${activeNavItem.bildirgilar}`}
           >
             Bildirgi xatlari
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link
+            to="/documents"
+            className={`nav-link  ${activeNavItem.documents}`}
+          >
+            Xujjatlar
           </Link>
         </li>
       </ul>

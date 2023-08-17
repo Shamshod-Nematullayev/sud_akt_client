@@ -14,6 +14,7 @@ import { Provider } from "react-redux";
 import { store } from "./app/store";
 import Bildirgilar from "./pages/Bildirgilar";
 import Pachkalar from "./pages/Pachkalar";
+import Documents from "./pages/Documents";
 
 function App() {
   const darkTheme = createTheme({
@@ -34,6 +35,7 @@ function App() {
             <Route path="/dalolatnomalar" element={<Dalolatnomalar />} />
             <Route path="/bildirgilar" element={<Bildirgilar />} />
             <Route path="/pachkalar" element={<Pachkalar />} />
+            <Route path="/documents" element={<Documents />} />
           </Routes>
           <ToastContainer autoClose="3000" theme="light" position="top-right" />
         </ThemeProvider>

@@ -51,7 +51,6 @@ export default function Forma1() {
           <div key={params.row.id} className="d-flex">
             <a
               onClick={(e) => {
-                console.log(params);
                 onLoadFile(params.row.file_id, params.row.file_name);
               }}
             >
