@@ -12,6 +12,7 @@ export default function Documents() {
   const [rows, setRows] = useState((prevState = [], props) => {
     return prevState;
   });
+  const [datas, setDatas] = useState([]);
   const [showBackdrop, setShowBackrop] = useState(true);
   const [checked, setChecked] = useState("");
 
@@ -44,7 +45,9 @@ export default function Documents() {
         return (
           <a
             onClick={() => onLoadFile(params.row.file_id, params.row.file_name)}
-          ></a>
+          >
+            {params.row.file_name}
+          </a>
         );
       },
     },
@@ -52,24 +55,43 @@ export default function Documents() {
   const fetchData = async () => {
     setShowBackrop(true);
     const respond = await axios.get(API.documents);
-    let data = respond.data.pachkalar.map((data, i) => {
+    console.log(respond);
+    let data = respond.data.documents.map((data, i) => {
       return {
         id: i + 1,
-        name: data.name,
-        createdAt: data.createdAt,
-        description: data.description,
-        sended_sud: data.sended_sud,
+        name: data.doc_type,
+        createdAt: data.date,
+        inspector: data.inspector,
         _id: data._id,
-        elemnts_count: data.elements.length,
-        sended_sud_time: data.sended_sud_time,
+        abonent: data.abonent,
+        abonents: data.abonents,
+        doc_num: data.doc_num,
+        file_id: data.file_id,
+        file_name: data.file_name,
       };
     });
     setShowBackrop(false);
+    setDatas(data);
     setRows(data);
   };
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Qidirish funksiyasi
+  const handleSearch = (text) => {
+    setRows(
+      datas.filter((data) => {
+        let found = false;
+        data.abonents.forEach((abonent) => {
+          if (abonent.Litsavoy_kod?.includes(text)) found = true;
+          if (abonent.Dvaynik_kod?.includes(text)) found = true;
+        });
+        if (String(data.abonent).includes(text)) found = true;
+        return found;
+      })
+    );
+  };
 
   return (
     <div className="admin-page">
@@ -92,6 +114,7 @@ export default function Documents() {
             checked={checked}
             setChecked={setChecked}
             fetchData={fetchData}
+            handleSearch={handleSearch}
           />
 
           {/* Data Table */}

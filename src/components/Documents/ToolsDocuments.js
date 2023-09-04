@@ -13,40 +13,73 @@ import {
   TextareaAutosize,
   TextField,
 } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { Link } from "react-router-dom";
 import api from "../../utils/axios";
 import { toast } from "react-toastify";
 import * as XLSX from "xlsx";
-import { Label } from "@mui/icons-material";
+
+// icons
+import CachedIcon from "@mui/icons-material/Cached";
+import SearchIcon from "@mui/icons-material/Search";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+
+import API from "../../utils/APIRouters";
+import axios from "axios";
 
 function ToolsDocuments({
   handleChecked,
   fetchData,
   checked,
+  handleSearch,
   setChecked,
   rows,
 }) {
+  const initialValues = {
+    doc_type: "dalolatnoma",
+    abonent: "",
+    inspector: "fuqoro",
+    file: "",
+    comment: "",
+  };
   // -----------States -------------------//
   const [open, setOpen] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [values, setValues] = useState({
-    doc_type: "dalolatnoma",
-    inspector: "fuqoro",
-  });
+  const [values, setValues] = useState(initialValues);
   const [inspectors, setInspectors] = useState([]);
   const [excelFile, setExcelFile] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
 
   // -----------Handlers -----------------//
   async function handleCreateSubmit(e) {
     e.preventDefault();
-    let excelData;
+    let excelData = [];
     if (values.doc_type == "xatlov") {
       excelData = await handleChangeExcel();
     }
-    setOpen(false);
+    console.log(excelData);
+    const res = await axios.post(
+      API.documents + "create",
+      {
+        ...values,
+        abonents: excelData,
+      },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    if (res.data.ok) {
+      toast.success(res.data.message);
+      setValues(initialValues);
+      setOpen(false);
+      fetchData();
+    } else {
+      toast.error(res.data.message);
+    }
   }
 
   async function handleChangeExcel(e) {
@@ -181,8 +214,20 @@ function ToolsDocuments({
                   ))}
                 </Select>
                 Xujjat fayli
-                <TextField type="file" className="my-2" />
-                <TextareaAutosize placeholder="Izoh uchun"></TextareaAutosize>
+                <TextField
+                  type="file"
+                  name="file"
+                  onChange={(e) => {
+                    setValues({ ...values, file: e.target.files[0] });
+                  }}
+                  className="my-2"
+                />
+                <TextareaAutosize
+                  placeholder="Izoh uchun"
+                  name="comment"
+                  value={values.comment}
+                  onChange={handleChange}
+                ></TextareaAutosize>
               </Stack>
             </DialogContent>
             <DialogActions>
@@ -228,7 +273,27 @@ function ToolsDocuments({
         >
           <AddIcon /> Yaratish
         </Button>
-        <Button
+        <TextField
+          id="outlined-search"
+          label="Litsavoy"
+          type="search"
+          onChange={(e) => setSearchValue(e.target.value)}
+          sx={
+            {
+              // height: 15,
+            }
+          }
+        ></TextField>
+        {/* <Button color="secondary" variant="contained">
+          <img src={ExcelSvg} style={{ height: 25 }} /> Excelga
+        </Button> */}
+        <Button onClick={() => handleSearch(searchValue)}>
+          <SearchIcon />
+        </Button>
+        <Button variant="contained" onClick={fetchData}>
+          <CachedIcon />
+        </Button>
+        {/* <Button
           color="warning"
           variant="contained"
           data-bs-toggle=""
@@ -239,7 +304,7 @@ function ToolsDocuments({
           }}
         >
           <EditIcon /> Tahrirlash
-        </Button>{" "}
+        </Button>{" "} */}
         <Button
           color="primary"
           variant="contained"
