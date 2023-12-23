@@ -3,8 +3,11 @@ import { loginAPI } from "../utils/APIRouters";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../store/authStore";
 
 function Login() {
+  const setUser = useAuthStore((state) => state.setUser);
+
   const [values, setValues] = useState({
     login: "",
     password: "",
@@ -39,6 +42,7 @@ function Login() {
     if (!data.ok) {
       return toast.error(data.message);
     } else {
+      setUser(data.user);
       localStorage.setItem("user_data", JSON.stringify(data.user));
       navigate("/dashboard");
     }

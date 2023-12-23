@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React, { Component } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import "./index.css";
@@ -10,11 +10,36 @@ import Forma1 from "./pages/Forma1";
 import Dalolatnomalar from "./pages/Dalolatnomalar";
 import { ThemeProvider, createTheme } from "@mui/material";
 import { ToastContainer } from "react-toastify";
-import { Provider } from "react-redux";
+import { Provider, useSelector } from "react-redux";
 import { store } from "./app/store";
 import Bildirgilar from "./pages/Bildirgilar";
 import Pachkalar from "./pages/Pachkalar";
 import Documents from "./pages/Documents";
+import AppRoutes from "./components/Routers";
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // Log the error to an error reporting service
+    console.error("Error Boundary caught an error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong. Please try again later.</h1>;
+    }
+
+    return this.props.children;
+  }
+}
 
 function App() {
   const darkTheme = createTheme({
@@ -24,19 +49,9 @@ function App() {
     <Provider store={store}>
       <BrowserRouter className="App">
         <ThemeProvider theme={darkTheme}>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/aktlar/" element={<Aktlar />} />
-            <Route path="/aktlar/:pachka_id" element={<Aktlar />} />
-            <Route path="/ogohlantirish_xatlar" element={<Ogohlantirish />} />
-            <Route path="/forma_bir" element={<Forma1 />} />
-            <Route path="/dalolatnomalar" element={<Dalolatnomalar />} />
-            <Route path="/bildirgilar" element={<Bildirgilar />} />
-            <Route path="/pachkalar" element={<Pachkalar />} />
-            <Route path="/documents" element={<Documents />} />
-          </Routes>
+          <ErrorBoundary>
+            <AppRoutes />
+          </ErrorBoundary>
           <ToastContainer autoClose="3000" theme="light" position="top-right" />
         </ThemeProvider>
       </BrowserRouter>

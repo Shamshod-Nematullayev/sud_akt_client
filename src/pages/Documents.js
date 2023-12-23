@@ -4,7 +4,6 @@ import SideBar from "../components/SideBar";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "axios";
 import API from "../utils/APIRouters";
-import ToolsPachkalar from "../components/Pachkalar/PachkalarTools";
 import fileDownload from "js-file-download";
 import ToolsDocuments from "../components/Documents/ToolsDocuments";
 
@@ -55,7 +54,6 @@ export default function Documents() {
   const fetchData = async () => {
     setShowBackrop(true);
     const respond = await axios.get(API.documents);
-    console.log(respond);
     let data = respond.data.documents.map((data, i) => {
       return {
         id: i + 1,

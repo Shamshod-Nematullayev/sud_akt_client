@@ -55,6 +55,14 @@ function ToolsDocuments({
   async function handleCreateSubmit(e) {
     e.preventDefault();
     let excelData = [];
+    if (values.doc_type == "dalolatnoma" || values.doc_type == "game_over") {
+      if (String(values.abonent).length != 12 || isNaN(values.abonent)) {
+        return toast.error("Abonent hisob raqami noto'g'ri formatda kiritildi");
+      }
+      if (!values.abonent || values.abonent == "") {
+        return toast.error("Abonent xisob raqami kiritilmadi");
+      }
+    }
     if (values.doc_type == "xatlov") {
       excelData = await handleChangeExcel();
     }
