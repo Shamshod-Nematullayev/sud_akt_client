@@ -152,7 +152,7 @@ export default function Forma1() {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-      <SideBar active="forma1" />
+      <SideBar active="forma_bir" />
       <div className="container">
         <div className="table-container">
           {/* MODAL WINDOWS */}

@@ -11,9 +11,38 @@ function SideBar({ active }) {
     documents: "link-body-emphasis",
   });
 
-  useEffect(() => {
-    setActiveNavItem({ ...activeNavItem, [active]: "active" });
-  }, []);
+  const navItems = [
+    {
+      to: "/pachkalar",
+      active: "aktlar",
+      text: "Aktlar",
+    },
+    {
+      to: "/ogohlantirish_xatlar",
+      active: "ogohlantirish_xatlar",
+      text: "Ogohlantirish xatlari",
+    },
+    {
+      to: "/forma_bir",
+      active: "forma_bir",
+      text: "Forma 1",
+    },
+    {
+      to: "/dalolatnomalar",
+      active: "dalolatnomalar",
+      text: "Dalolatnomalar",
+    },
+    {
+      to: "/bildirgilar",
+      active: "bildirgilar",
+      text: "Bildirgi xatlari",
+    },
+    {
+      to: "/documents",
+      active: "documents",
+      text: "Xujjatlar",
+    },
+  ];
 
   return (
     <div className="side-bar d-flex flex-column flex-shrink-0 p-3 bg-body-tertiary">
@@ -26,52 +55,18 @@ function SideBar({ active }) {
         </Link>
       </div>
       <ul className="nav nav-pills flex-column mb-auto">
-        <li className="nav-item">
-          <Link
-            to="/pachkalar"
-            className={`nav-link ${activeNavItem.aktlar}`}
-            aria-current="page"
-          >
-            Aktlar
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link
-            to="/ogohlantirish_xatlar"
-            className={`nav-link ${activeNavItem.ogohlantirish}`}
-          >
-            Ogohlantirish xatlari
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link to="/forma_bir" className={`nav-link  ${activeNavItem.forma1}`}>
-            Forma 1
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link
-            to="/dalolatnomalar"
-            className={`nav-link  ${activeNavItem.dalolatnomalar}`}
-          >
-            Dalolatnomalar
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link
-            to="/bildirgilar"
-            className={`nav-link  ${activeNavItem.bildirgilar}`}
-          >
-            Bildirgi xatlari
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link
-            to="/documents"
-            className={`nav-link  ${activeNavItem.documents}`}
-          >
-            Xujjatlar
-          </Link>
-        </li>
+        {navItems.map((item) => (
+          <li className="nav-item">
+            <Link
+              to={item.to}
+              className={`nav-link ${
+                active === `${item.active}` ? "active" : "link-body-emphasis"
+              }`}
+            >
+              {item.text}
+            </Link>
+          </li>
+        ))}
       </ul>
     </div>
   );

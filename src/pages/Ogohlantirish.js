@@ -85,7 +85,7 @@ function Aktlar() {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
-      <SideBar active="ogohlantirish" />
+      <SideBar active="ogohlantirish_xatlar" />
       <div className="container">
         <div className="table-container">
           {/* MODAL WINDOWS */}
