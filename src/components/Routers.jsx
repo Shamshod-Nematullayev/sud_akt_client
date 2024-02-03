@@ -12,17 +12,19 @@ import Pachkalar from "../pages/Pachkalar";
 import NotFound from "../components/NotFound/NotFound"; // Add a NotFound component for 404 pages
 import Documents from "../pages/Documents";
 import useAuthStore from "../store/authStore";
+import Qulayliklar from "../pages/Qulayliklar";
 
 const PrivateRoute = ({ element, ...props }) => {
   const isAuthenticated = useAuthStore((state) => state.user);
 
+  return element; // vaqtincha dastur ishlab chiqilayotganiligi sababli auth o'chirib qo'yildi
   return isAuthenticated ? element : <Navigate to="/login" />;
 };
 
 const AppRoutes = () => (
   <Routes>
     <Route path="/login" element={<Login />} />
-    <Route path="/" element={<Dashboard />} />
+    <Route path="/" element={<PrivateRoute element={<Dashboard />} />} />
     <Route
       path="/dashboard"
       element={<PrivateRoute element={<Dashboard />} />}
@@ -48,6 +50,10 @@ const AppRoutes = () => (
     <Route
       path="/documents"
       element={<PrivateRoute element={<Documents />} />}
+    />
+    <Route
+      path="/qulayliklar"
+      element={<PrivateRoute element={<Qulayliklar />} />}
     />
     <Route path="*" element={<NotFound />} />
   </Routes>

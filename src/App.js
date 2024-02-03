@@ -1,20 +1,11 @@
 import React, { Component } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
+import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
-import Aktlar from "./pages/Aktlar";
-import Ogohlantirish from "./pages/Ogohlantirish";
-import Forma1 from "./pages/Forma1";
-import Dalolatnomalar from "./pages/Dalolatnomalar";
 import { ThemeProvider, createTheme } from "@mui/material";
 import { ToastContainer } from "react-toastify";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import { store } from "./app/store";
-import Bildirgilar from "./pages/Bildirgilar";
-import Pachkalar from "./pages/Pachkalar";
-import Documents from "./pages/Documents";
 import AppRoutes from "./components/Routers";
 
 class ErrorBoundary extends Component {

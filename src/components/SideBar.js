@@ -42,6 +42,11 @@ function SideBar({ active }) {
       active: "documents",
       text: "Xujjatlar",
     },
+    {
+      to: "/qulayliklar",
+      active: "qulayliklar",
+      text: "Uskunalar",
+    },
   ];
 
   return (
