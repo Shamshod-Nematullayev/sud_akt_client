@@ -13,6 +13,7 @@ import NotFound from "../components/NotFound/NotFound"; // Add a NotFound compon
 import Documents from "../pages/Documents";
 import useAuthStore from "../store/authStore";
 import Qulayliklar from "../pages/Qulayliklar";
+import Calculator from "./Calculator/Calculator";
 
 const PrivateRoute = ({ element, ...props }) => {
   const isAuthenticated = useAuthStore((state) => state.user);
@@ -54,6 +55,10 @@ const AppRoutes = () => (
     <Route
       path="/qulayliklar"
       element={<PrivateRoute element={<Qulayliklar />} />}
+    />
+    <Route
+      path="/calculator"
+      element={<PrivateRoute element={<Calculator />} />}
     />
     <Route path="*" element={<NotFound />} />
   </Routes>

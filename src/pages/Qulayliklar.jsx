@@ -1,7 +1,8 @@
 import { Button, Modal } from "@mui/material";
 import React from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import SideBar from "../components/SideBar";
-import YourComponent from "./Test";
 
 export default function Qulayliklar() {
   return (
@@ -19,9 +20,12 @@ export default function Qulayliklar() {
           >
             Ikkilamchilarni o'chirish
           </Button>
+          <Link to="/calculator">
+            <Button color="secondary" variant="contained">
+              Kalkulyator
+            </Button>
+          </Link>
         </div>
-        <YourComponent />
-        {/* <Modal open={true}></Modal> */}
       </div>
     </div>
   );
