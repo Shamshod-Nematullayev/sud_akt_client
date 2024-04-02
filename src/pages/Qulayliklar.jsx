@@ -25,6 +25,11 @@ export default function Qulayliklar() {
               Kalkulyator
             </Button>
           </Link>
+          <Link to="/addressToConvert">
+            <Button color="info" variant="contained">
+              Kanvertga manzil
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
