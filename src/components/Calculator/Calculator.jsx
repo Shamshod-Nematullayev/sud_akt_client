@@ -3,6 +3,7 @@ import {
   IconButton,
   Modal,
   Paper,
+  Switch,
   TextField,
   Typography,
 } from "@mui/material";
@@ -13,6 +14,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import SideBar from "../SideBar";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { Label } from "@mui/icons-material";
+import "./style.css";
 
 export default function Calculator() {
   const hisoblandiJadval = [
@@ -78,6 +81,8 @@ export default function Calculator() {
     { month: 12, year: 2023, hisoblandi: 4129 },
     { month: 1, year: 2024, hisoblandi: 4129 },
     { month: 2, year: 2024, hisoblandi: 4129 },
+    { month: 3, year: 2024, hisoblandi: 4129 },
+    { month: 4, year: 2024, hisoblandi: 4625 },
   ];
   const [currentTotal, setCurrentTotal] = useState(0);
   const [fromMoon, setFromMoon] = useState(1);
@@ -238,6 +243,52 @@ export default function Calculator() {
                 );
               })}
             </ul>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              width: "160px",
+              marginTop: "80px",
+            }}
+          >
+            <div style={{ display: "flex" }}>
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                Auto-akt №
+                <Switch />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  marginTop: 2,
+                }}
+              >
+                _______
+                <TextField
+                  id="akt_number_text_field"
+                  fullWidth
+                  placeholder="№"
+                  style={{ padding: "0px" }}
+                />
+              </div>
+            </div>
+            <TextField
+              placeholder="Лицавой"
+              type="number"
+              inputProps={{ inputMode: "numeric" }}
+              fullWidth
+            />
+            <div className="file-input-container">
+              <input type="file" id="fileInput" class="file-input" />
+              <label
+                for="fileInput"
+                class="custom-file-button"
+                style={{ width: "160px" }}
+              >
+                Choose File
+              </label>
+            </div>
           </div>
           <Typography
             style={{

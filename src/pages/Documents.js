@@ -31,7 +31,7 @@ export default function Documents() {
   };
 
   const columns = [
-    { field: "id", headerName: "№", width: 50 },
+    { field: "id", headerName: "№", width: 70 },
     { field: "name", headerName: "Xujjat turi" },
     { field: "createdAt", headerName: "Yaratilish sanasi", width: 150 },
     { field: "inspector", headerName: "Nazoratchi", width: 150 },

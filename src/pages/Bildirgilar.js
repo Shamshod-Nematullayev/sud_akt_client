@@ -56,7 +56,7 @@ function Bildirgilar() {
         id: data.doc_num,
         kod: data.kod,
         fish: data.inspector.name,
-        mahalla: data.mahallalar[0].name,
+        // mahalla: data.mahallalar[0].name,
         date: `${data.date.year}/${data.date.month}/${data.date.day}`,
         actions: [data.file_link, data._id],
         abonents: data.abonents,
