@@ -4,6 +4,7 @@ import {
   Modal,
   Paper,
   Switch,
+  TextareaAutosize,
   TextField,
   Typography,
 } from "@mui/material";
@@ -92,6 +93,7 @@ export default function Calculator() {
   const [yashovchilar, setYashovchilar] = useState(1);
   const [countes, setCountes] = useState([]);
   const [total, setTotal] = useState([]);
+  const [aktNumberDisabled, setAktNumberDisabled] = useState(false);
 
   const handleAddClick = () => {
     setCountes([
@@ -255,7 +257,13 @@ export default function Calculator() {
             <div style={{ display: "flex" }}>
               <div style={{ display: "flex", flexDirection: "column" }}>
                 Auto-akt №
-                <Switch />
+                <Switch
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                    } else {
+                    }
+                  }}
+                />
               </div>
               <div
                 style={{
@@ -269,6 +277,7 @@ export default function Calculator() {
                   id="akt_number_text_field"
                   fullWidth
                   placeholder="№"
+                  disabled={aktNumberDisabled}
                   style={{ padding: "0px" }}
                 />
               </div>
@@ -289,6 +298,29 @@ export default function Calculator() {
                 Choose File
               </label>
             </div>
+            <TextField
+              placeholder="Yashovchi soni"
+              type="number"
+              inputProps={{ inputMode: "numeric" }}
+              fullWidth
+            />
+            <TextField
+              placeholder="Akt summasi"
+              type="number"
+              inputProps={{ inputMode: "numeric" }}
+              fullWidth
+            />
+            <TextareaAutosize
+              placeholder="Izoh"
+              onFocus={(event) => {
+                event.target.setSelectionRange(0, event.target.value.length);
+              }}
+            >
+              MFY dalolatnomasi
+            </TextareaAutosize>
+            <Button variant="contained" color="primary" disabled>
+              AKT qilish
+            </Button>
           </div>
           <Typography
             style={{
