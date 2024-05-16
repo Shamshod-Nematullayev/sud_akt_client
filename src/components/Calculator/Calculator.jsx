@@ -1,25 +1,22 @@
 import {
   Button,
-  IconButton,
-  Modal,
   Paper,
   Switch,
   TextareaAutosize,
   TextField,
   Typography,
 } from "@mui/material";
-import { GridDeleteIcon } from "@mui/x-data-grid";
+import CachedIcon from "@mui/icons-material/Cached";
 
 import React, { useEffect } from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import SideBar from "../SideBar";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Label } from "@mui/icons-material";
 import "./style.css";
 import axios from "axios";
 import { getNextIncomingDocNum, createFullAkt } from "../../utils/APIRouters";
 import { toast } from "react-toastify";
+import DataTable from "./DataTable";
 
 export default function Calculator() {
   const hisoblandiJadval = [
@@ -259,198 +256,214 @@ export default function Calculator() {
               })}
             </ul>
           </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              width: "160px",
-              marginTop: "80px",
-            }}
-          >
-            <div style={{ display: "flex" }}>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                Auto-akt №
-                <Switch
-                  onChange={async (e) => {
-                    if (e.target.checked) {
-                      setAktNumberDisabled(true);
-                      const res = await axios.get(getNextIncomingDocNum);
-                      setAktNumber(res.data.value);
-                    } else {
-                      setAktNumber("");
-                      setAktNumberDisabled(false);
-                    }
-                  }}
-                />
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  marginTop: 2,
-                }}
-              >
-                _______
-                <TextField
-                  id="akt_number_text_field"
-                  fullWidth
-                  placeholder="№"
-                  disabled={aktNumberDisabled}
-                  type="number"
-                  value={aktNumber}
-                  onChange={(e) => setAktNumber(e.target.value)}
-                  style={{ padding: "0px" }}
-                />
-              </div>
-            </div>
-            <TextField
-              placeholder="Лицавой"
-              type="number"
-              disabled={createAktButtonDisabled}
-              inputProps={{ inputMode: "numeric" }}
-              fullWidth
-              value={licshet}
-              onChange={(e) => setLicshet(e.target.value)}
-            />
-            <div className="file-input-container">
-              <input
-                type="file"
-                id="fileInput"
-                className="file-input"
-                disabled={createAktButtonDisabled}
-                onChange={(e) => {
-                  setAktFile(e.target.files[0]);
-                  setFileInputLabel(e.target.files[0].name);
-                }}
-              />
-              <label
-                htmlFor="fileInput"
-                className="custom-file-button"
-                style={{ width: "160px" }}
-              >
-                {fileInputLabel}
-              </label>
-            </div>
-            <div style={{ display: "flex" }}>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <Switch
-                  defaultChecked={true}
-                  onChange={async (e) => {
-                    if (e.target.checked) {
-                      setYashovchiInputDisable(false);
-                      set_prescribed_cnt(0);
-                    } else {
-                      set_prescribed_cnt("");
-                      setYashovchiInputDisable(true);
-                    }
-                  }}
-                />
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  marginTop: 2,
-                }}
-              >
-                <TextField
-                  placeholder="Yashovchi soni"
-                  type="number"
-                  inputProps={{ inputMode: "numeric" }}
-                  disabled={yashovchiInputDisable}
-                  value={prescribed_cnt}
-                  onChange={(e) => set_prescribed_cnt(e.target.value)}
-                  style={{
-                    width: "80%",
-                  }}
-                />
-              </div>
-            </div>
-            <div style={{ display: "flex" }}>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <Switch
-                  defaultChecked={true}
-                  onChange={async (e) => {
-                    if (e.target.checked) {
-                      setAktSummasiInputDisabled(false);
-                      setAmount(0);
-                    } else {
-                      setAmount("");
-                      setAktSummasiInputDisabled(true);
-                    }
-                  }}
-                />
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  marginTop: 2,
-                }}
-              >
-                <TextField
-                  placeholder="Akt summasi"
-                  type="number"
-                  disabled={aktSummasiInputDisabled}
-                  inputProps={{ inputMode: "numeric" }}
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  style={{
-                    width: "100%",
-                  }}
-                />
-              </div>
-            </div>
-            <TextareaAutosize
-              placeholder="Izoh"
-              disabled={createAktButtonDisabled}
-              onFocus={(event) => {
-                event.target.setSelectionRange(0, event.target.value.length);
-              }}
-              onChange={(e) => setComment(e.target.value)}
-              defaultValue={comment}
-            ></TextareaAutosize>
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={createAktButtonDisabled}
-              onClick={async (e) => {
-                if (!aktFile) {
-                  return toast.error(`Fayl tanlanmagan`);
-                }
-                setCreateAktButtonDisabled(true);
-                const res = await axios.post(
-                  createFullAkt,
-                  {
-                    file: aktFile,
-                    autoAktNumber: aktNumberDisabled,
-                    akt_number: aktNumber,
-                    comment,
-                    licshet,
-                    prescribed_cnt,
-                    yashovchilarUzgartirish: !yashovchiInputDisable,
-                    qaytaHisobBuladi: !aktSummasiInputDisabled,
-                    amount,
-                  },
-                  {
-                    headers: {
-                      "Content-Type": "multipart/form-data",
-                    },
-                  }
-                );
-                set_prescribed_cnt("");
-                setAmount("");
-                setLicshet("");
-                setAktFile(null);
-                setFileInputLabel("Choose file");
-                const res2 = await axios.get(getNextIncomingDocNum);
-                setAktNumber(res2.data.value);
-                setCreateAktButtonDisabled(false);
+          <div style={{ display: "flex" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                width: "160px",
+                marginTop: "80px",
               }}
             >
-              AKT qilish
-            </Button>
+              <div style={{ display: "flex" }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  Auto-akt №
+                  <Switch
+                    onChange={async (e) => {
+                      if (e.target.checked) {
+                        setAktNumberDisabled(true);
+                        const res = await axios.get(getNextIncomingDocNum);
+                        setAktNumber(res.data.value);
+                      } else {
+                        setAktNumber("");
+                        setAktNumberDisabled(false);
+                      }
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginTop: 2,
+                  }}
+                >
+                  _______
+                  <TextField
+                    id="akt_number_text_field"
+                    fullWidth
+                    placeholder="№"
+                    disabled={aktNumberDisabled}
+                    type="number"
+                    value={aktNumber}
+                    onChange={(e) => setAktNumber(e.target.value)}
+                    style={{ padding: "0px" }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: "flex", position: "relative" }}>
+                <TextField
+                  placeholder="Лицавой"
+                  type="number"
+                  disabled={createAktButtonDisabled}
+                  inputProps={{ inputMode: "numeric" }}
+                  fullWidth
+                  value={licshet}
+                  onChange={(e) => setLicshet(e.target.value)}
+                />
+                <Button
+                  variant="contained"
+                  style={{
+                    position: "absolute",
+                    height: "100%",
+                    right: "-40%",
+                  }}
+                >
+                  <CachedIcon />
+                </Button>
+              </div>
+              <div className="file-input-container">
+                <input
+                  type="file"
+                  id="fileInput"
+                  className="file-input"
+                  disabled={createAktButtonDisabled}
+                  onChange={(e) => {
+                    setAktFile(e.target.files[0]);
+                    setFileInputLabel(e.target.files[0].name);
+                  }}
+                />
+                <label
+                  htmlFor="fileInput"
+                  className="custom-file-button"
+                  style={{ width: "160px" }}
+                >
+                  {fileInputLabel}
+                </label>
+              </div>
+              <div style={{ display: "flex" }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <Switch
+                    defaultChecked={true}
+                    onChange={async (e) => {
+                      if (e.target.checked) {
+                        setYashovchiInputDisable(false);
+                        set_prescribed_cnt(0);
+                      } else {
+                        set_prescribed_cnt("");
+                        setYashovchiInputDisable(true);
+                      }
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginTop: 2,
+                  }}
+                >
+                  <TextField
+                    placeholder="Yashovchi soni"
+                    type="number"
+                    inputProps={{ inputMode: "numeric" }}
+                    disabled={yashovchiInputDisable}
+                    value={prescribed_cnt}
+                    onChange={(e) => set_prescribed_cnt(e.target.value)}
+                    style={{
+                      width: "80%",
+                    }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: "flex" }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <Switch
+                    defaultChecked={true}
+                    onChange={async (e) => {
+                      if (e.target.checked) {
+                        setAktSummasiInputDisabled(false);
+                        setAmount(0);
+                      } else {
+                        setAmount("");
+                        setAktSummasiInputDisabled(true);
+                      }
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    marginTop: 2,
+                  }}
+                >
+                  <TextField
+                    placeholder="Akt summasi"
+                    type="number"
+                    disabled={aktSummasiInputDisabled}
+                    inputProps={{ inputMode: "numeric" }}
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    style={{
+                      width: "100%",
+                    }}
+                  />
+                </div>
+              </div>
+              <TextareaAutosize
+                placeholder="Izoh"
+                disabled={createAktButtonDisabled}
+                onFocus={(event) => {
+                  event.target.setSelectionRange(0, event.target.value.length);
+                }}
+                onChange={(e) => setComment(e.target.value)}
+                defaultValue={comment}
+              ></TextareaAutosize>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={createAktButtonDisabled}
+                onClick={async (e) => {
+                  if (!aktFile) {
+                    return toast.error(`Fayl tanlanmagan`);
+                  }
+                  setCreateAktButtonDisabled(true);
+                  const res = await axios.post(
+                    createFullAkt,
+                    {
+                      file: aktFile,
+                      autoAktNumber: aktNumberDisabled,
+                      akt_number: aktNumber,
+                      comment,
+                      licshet,
+                      prescribed_cnt,
+                      yashovchilarUzgartirish: !yashovchiInputDisable,
+                      qaytaHisobBuladi: !aktSummasiInputDisabled,
+                      amount,
+                    },
+                    {
+                      headers: {
+                        "Content-Type": "multipart/form-data",
+                      },
+                    }
+                  );
+                  set_prescribed_cnt("");
+                  setAmount("");
+                  setLicshet("");
+                  setAktFile(null);
+                  setFileInputLabel("Choose file");
+                  const res2 = await axios.get(getNextIncomingDocNum);
+                  setAktNumber(res2.data.value);
+                  setCreateAktButtonDisabled(false);
+                }}
+              >
+                AKT qilish
+              </Button>
+            </div>
+            <DataTable />
           </div>
+
           <Typography
             style={{
               position: "absolute",
