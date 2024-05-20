@@ -9,3 +9,4 @@ module.exports.pachkalar = `${this.host}/api/pachkalar/`;
 module.exports.documents = `${this.host}/api/documents/`;
 module.exports.getNextIncomingDocNum = `${this.host}/api/billing/next-incoming-document-number/`;
 module.exports.createFullAkt = `${this.host}/api/billing/create-full-akt/`;
+module.exports.getDXJ = `${this.host}/api/billing/get-abonent-dxj-by-licshet/`;

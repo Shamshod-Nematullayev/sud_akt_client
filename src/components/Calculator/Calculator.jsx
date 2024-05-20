@@ -17,6 +17,7 @@ import axios from "axios";
 import { getNextIncomingDocNum, createFullAkt } from "../../utils/APIRouters";
 import { toast } from "react-toastify";
 import DataTable from "./DataTable";
+const APIs = require("../../utils/APIRouters");
 
 export default function Calculator() {
   const hisoblandiJadval = [
@@ -104,6 +105,7 @@ export default function Calculator() {
   const [amount, setAmount] = useState("");
   const [yashovchiInputDisable, setYashovchiInputDisable] = useState(false);
   const [aktSummasiInputDisabled, setAktSummasiInputDisabled] = useState(false);
+  const [rows, setRows] = useState([]);
 
   const handleAddClick = () => {
     setCountes([
@@ -141,17 +143,49 @@ export default function Calculator() {
     setTotal(total);
   }, [countes]);
 
+  const handleRefreshFromBilling = async () => {
+    console.log({ licshet });
+    if (licshet == "") {
+      return toast.error("Hisob raqami bo'sh");
+    }
+    const result = await axios.get(APIs.getDXJ + licshet);
+    console.log(result);
+    if (result.data.ok) {
+      const data = result.data.rows.map((data, i) => {
+        return {
+          id: i + 1,
+          period: data.period,
+          prescribed_cnt: data.prescribed_cnt,
+          saldo_n: Math.floor(data.saldo_n),
+          nachis: Math.floor(data.nachis),
+          saldo_k: Math.floor(data.saldo_k),
+          akt: Math.floor(data.akt),
+          income: Math.floor(
+            Number(data.postup_kvit) +
+              Number(data.postup_munis) +
+              Number(data.postup_plat) +
+              Number(data.postup_rp)
+          ),
+        };
+      });
+      setRows(data);
+    } else {
+      toast.error(result.data.message);
+    }
+  };
+
   return (
     <div className="admin-page">
       {/* Yuklanmoqda loader */}
       <SideBar active="qulayliklar" />
 
-      <div className="container">
+      <div className="container" style={{ margin: "10px 100px" }}>
         <Paper
           style={{
             height: "80%",
             marginTop: "25px",
-            padding: 15,
+            width: "1600px",
+            padding: "35px 80px",
             position: "relative",
           }}
         >
@@ -227,7 +261,7 @@ export default function Calculator() {
                 {currentTotal}
               </span>
             </div>
-            <ul style={{ width: 400 }}>
+            <ul style={{ width: 400, position: "absolute", right: "10px" }}>
               {countes.map((count, i) => {
                 return (
                   <li
@@ -313,10 +347,11 @@ export default function Calculator() {
                 />
                 <Button
                   variant="contained"
+                  onClick={handleRefreshFromBilling}
                   style={{
                     position: "absolute",
                     height: "100%",
-                    right: "-40%",
+                    left: "-40%",
                   }}
                 >
                   <CachedIcon />
@@ -461,7 +496,9 @@ export default function Calculator() {
                 AKT qilish
               </Button>
             </div>
-            <DataTable />
+            <div style={{ margin: "40px 60px" }}>
+              <DataTable rows={rows} />
+            </div>
           </div>
 
           <Typography
