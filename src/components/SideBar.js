@@ -43,6 +43,11 @@ function SideBar({ active }) {
       text: "Xujjatlar",
     },
     {
+      to: "/inspectors",
+      active: "inspectors",
+      text: "Nazoratchilar",
+    },
+    {
       to: "/qulayliklar",
       active: "qulayliklar",
       text: "Uskunalar",
@@ -60,8 +65,8 @@ function SideBar({ active }) {
         </Link>
       </div>
       <ul className="nav nav-pills flex-column mb-auto">
-        {navItems.map((item) => (
-          <li className="nav-item">
+        {navItems.map((item, i) => (
+          <li className="nav-item" key={i}>
             <Link
               to={item.to}
               className={`nav-link ${

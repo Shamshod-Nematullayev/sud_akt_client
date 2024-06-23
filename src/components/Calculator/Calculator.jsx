@@ -85,6 +85,8 @@ export default function Calculator() {
     { month: 2, year: 2024, hisoblandi: 4129 },
     { month: 3, year: 2024, hisoblandi: 4129 },
     { month: 4, year: 2024, hisoblandi: 4625 },
+    { month: 5, year: 2024, hisoblandi: 4625 },
+    { month: 6, year: 2024, hisoblandi: 4625 },
   ];
   const [currentTotal, setCurrentTotal] = useState(0);
   const [fromMoon, setFromMoon] = useState(1);
@@ -106,6 +108,7 @@ export default function Calculator() {
   const [yashovchiInputDisable, setYashovchiInputDisable] = useState(false);
   const [aktSummasiInputDisabled, setAktSummasiInputDisabled] = useState(false);
   const [rows, setRows] = useState([]);
+  const [abonentData, setAbonentData] = useState({});
 
   const handleAddClick = () => {
     setCountes([
@@ -116,6 +119,7 @@ export default function Calculator() {
       },
     ]);
   };
+
   const qaytaHisob = ({ fromMoon, fromYear, toMoon, toYear, yashovchilar }) => {
     let summ = 0;
     for (let i = 0; i < hisoblandiJadval.length; i++) {
@@ -144,12 +148,10 @@ export default function Calculator() {
   }, [countes]);
 
   const handleRefreshFromBilling = async () => {
-    console.log({ licshet });
     if (licshet == "") {
       return toast.error("Hisob raqami bo'sh");
     }
     const result = await axios.get(APIs.getDXJ + licshet);
-    console.log(result);
     if (result.data.ok) {
       const data = result.data.rows.map((data, i) => {
         return {
@@ -169,8 +171,46 @@ export default function Calculator() {
         };
       });
       setRows(data);
+      setAbonentData({
+        mahalla_name: result.data.abonentData.mahalla_name,
+        fio: result.data.abonentData.fio,
+      });
     } else {
       toast.error(result.data.message);
+    }
+  };
+  const handleKeyDown = async (event) => {
+    if (event.key === "Enter") {
+      if (licshet == "") {
+        return toast.error("Hisob raqami bo'sh");
+      }
+      const result = await axios.get(APIs.getDXJ + licshet);
+      if (result.data.ok) {
+        const data = result.data.rows.map((data, i) => {
+          return {
+            id: i + 1,
+            period: data.period,
+            prescribed_cnt: data.prescribed_cnt,
+            saldo_n: Math.floor(data.saldo_n),
+            nachis: Math.floor(data.nachis),
+            saldo_k: Math.floor(data.saldo_k),
+            akt: Math.floor(data.akt),
+            income: Math.floor(
+              Number(data.postup_kvit) +
+                Number(data.postup_munis) +
+                Number(data.postup_plat) +
+                Number(data.postup_rp)
+            ),
+          };
+        });
+        setRows(data);
+        setAbonentData({
+          mahalla_name: result.data.abonentData.mahalla_name,
+          fio: result.data.abonentData.fio,
+        });
+      } else {
+        toast.error(result.data.message);
+      }
     }
   };
 
@@ -344,6 +384,7 @@ export default function Calculator() {
                   fullWidth
                   value={licshet}
                   onChange={(e) => setLicshet(e.target.value)}
+                  onKeyDown={handleKeyDown}
                 />
                 <Button
                   variant="contained"
@@ -483,11 +524,12 @@ export default function Calculator() {
                       },
                     }
                   );
+                  await handleRefreshFromBilling();
                   set_prescribed_cnt("");
                   setAmount("");
                   setLicshet("");
-                  setAktFile(null);
-                  setFileInputLabel("Choose file");
+                  // setAktFile(null);
+                  // setFileInputLabel("Choose file");
                   const res2 = await axios.get(getNextIncomingDocNum);
                   setAktNumber(res2.data.value);
                   setCreateAktButtonDisabled(false);
@@ -495,6 +537,10 @@ export default function Calculator() {
               >
                 AKT qilish
               </Button>
+              <br />
+              <br />
+              <div>MFY: {abonentData.mahalla_name}</div>
+              <div>FIO: {abonentData.fio}</div>
             </div>
             <div style={{ margin: "40px 60px" }}>
               <DataTable rows={rows} />

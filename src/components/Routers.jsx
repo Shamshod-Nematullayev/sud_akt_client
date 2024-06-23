@@ -15,6 +15,7 @@ import useAuthStore from "../store/authStore";
 import Qulayliklar from "../pages/Qulayliklar";
 import Calculator from "./Calculator/Calculator";
 import AddressToConvert from "./AddressToConvert/AddressToConvert";
+import Nazoratchilar from "../pages/Nazoratchilar";
 
 const PrivateRoute = ({ element, ...props }) => {
   const isAuthenticated = useAuthStore((state) => state.user);
@@ -60,6 +61,10 @@ const AppRoutes = () => (
     <Route
       path="/calculator"
       element={<PrivateRoute element={<Calculator />} />}
+    />
+    <Route
+      path="/inspectors"
+      element={<PrivateRoute element={<Nazoratchilar />} />}
     />
     <Route
       path="/addressToConvert"
