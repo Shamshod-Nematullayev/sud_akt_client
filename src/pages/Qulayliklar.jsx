@@ -25,9 +25,19 @@ export default function Qulayliklar() {
               Kalkulyator
             </Button>
           </Link>
+          <Link to="/createDalolatnoma">
+            <Button color="info" variant="contained">
+              Dalolatnomalar yaratish
+            </Button>
+          </Link>
           <Link to="/addressToConvert">
             <Button color="info" variant="contained">
               Kanvertga manzil
+            </Button>
+          </Link>
+          <Link to="/abarotkaChiqorish">
+            <Button color="secondary" variant="contained">
+              Abarotka chiqarish
             </Button>
           </Link>
         </div>

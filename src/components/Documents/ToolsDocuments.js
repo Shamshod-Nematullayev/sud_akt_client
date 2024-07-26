@@ -122,7 +122,7 @@ function ToolsDocuments({
     if (!data.ok) {
       return toast.error(data.message);
     }
-    setInspectors(data.inspectors);
+    setInspectors(data.rows);
   }
   useEffect(() => {
     getInspectors();

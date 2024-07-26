@@ -1,0 +1,36 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: aqua;
+}
+.container {
+  width: 90%;
+  margin: 0 auto;
+  /* padding: 20px; */
+}
+.header {
+  text-align: center;
+  font-weight: bold;
+}
+.content {
+  margin-top: 20px;
+}
+.content label {
+  display: block;
+  margin-top: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+tr {
+  position: relative;
+}
+td {
+  vertical-align: top;
+}
+.underline {
+  text-decoration: underline;
+}
+p {
+  text-align: justify;
+}

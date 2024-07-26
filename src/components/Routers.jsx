@@ -16,6 +16,8 @@ import Qulayliklar from "../pages/Qulayliklar";
 import Calculator from "./Calculator/Calculator";
 import AddressToConvert from "./AddressToConvert/AddressToConvert";
 import Nazoratchilar from "../pages/Nazoratchilar";
+import CreateDalolatnoma from "../pages/CreateDalolatnoma";
+import AbarotkaChiqorish from "../pages/AborotkaChiqorish";
 
 const PrivateRoute = ({ element, ...props }) => {
   const isAuthenticated = useAuthStore((state) => state.user);
@@ -69,6 +71,14 @@ const AppRoutes = () => (
     <Route
       path="/addressToConvert"
       element={<PrivateRoute element={<AddressToConvert />} />}
+    />
+    <Route
+      path="/createDalolatnoma"
+      element={<PrivateRoute element={<CreateDalolatnoma />} />}
+    />
+    <Route
+      path="/abarotkaChiqorish"
+      element={<PrivateRoute element={<AbarotkaChiqorish />} />}
     />
     <Route path="*" element={<NotFound />} />
   </Routes>
