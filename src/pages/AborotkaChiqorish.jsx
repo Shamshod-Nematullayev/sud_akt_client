@@ -200,7 +200,7 @@ export default function AbarotkaChiqorish() {
           <table>
             <tr>
               <td colSpan={7}>
-                <i>Oling Ong</i>
+                <i>Oliy Ong</i>
               </td>
             </tr>
             <tr>

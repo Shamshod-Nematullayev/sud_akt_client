@@ -99,3 +99,6 @@ a {
   size: portrait;
   margin: 15px 15px 10px 15px;
 }
+#print > * {
+  font-size: 16px;
+}
