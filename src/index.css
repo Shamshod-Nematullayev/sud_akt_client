@@ -78,3 +78,24 @@ body {
 a {
   cursor: pointer;
 }
+.abonent_rows th,
+.abonent_rows td {
+  border: 1px solid #000;
+  white-space: nowrap;
+  overflow: hidden;
+}
+/* .abonent_rows > td:nth-child(2) {
+  max-width: 60px;
+} */
+.abonent_rows > td:nth-child(3) {
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+.abonent_rows > td:nth-child(4) {
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+@page {
+  size: portrait;
+  margin: 15px 15px 10px 15px;
+}
