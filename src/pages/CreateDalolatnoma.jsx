@@ -16,12 +16,24 @@ import {
   MenuItem,
 } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
-import { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 
 const SpecialPageStyle = createGlobalStyle`
   @page {
     size: A4;
     margin: 15mm 15mm 15mm 25mm;
+  }
+`;
+const StyledTable = styled.table`
+  margin: auto;
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
   }
 `;
 
@@ -72,10 +84,13 @@ const CreateDalolatnoma = () => {
     try {
       setIsLoading(true);
       let respond2;
+      if (!licshet) {
+        setIsLoading(false);
+        return toast.error(`Kod o'rni bo'sh`);
+      }
       const respond = await axios.get(
         `${API.host}/api/billing/get-abonent-dxj-by-licshet/${licshet}`
       );
-      console.log({ data: respond.data.abonentData });
       if (!respond.data.ok) {
         setIsLoading(false);
         return toast.error(respond.data.message);
@@ -86,9 +101,18 @@ const CreateDalolatnoma = () => {
       setAbonentData(respond.data.abonentData);
       setMahalla(mfy_data.data.data);
       if (documentType == "dvaynik") {
+        if (!ikkilamchiKod) {
+          setIsLoading(false);
+          return toast.error(`Ikkilamchi kod o'rni bo'sh`);
+        }
         respond2 = await axios.get(
           `${API.host}/api/billing/get-abonent-dxj-by-licshet/${ikkilamchiKod}`
         );
+        if (!respond2.data.ok) {
+          setIsLoading(false);
+          return toast.error(respond.data.message);
+        }
+        setAbonentData2(respond2.data.abonentData);
 
         if (
           respond.data.abonentData.mahallas_id !=
@@ -97,7 +121,6 @@ const CreateDalolatnoma = () => {
           const mfy_data = await axios.get(
             `${API.host}/api/billing/get-mfy-by-id/${respond.data.abonentData.mahallas_id}`
           );
-          setAbonentData2(respond2.data.abonentData);
           setMahalla2(mfy_data.data.data);
         }
       }
@@ -304,6 +327,8 @@ const CreateDalolatnoma = () => {
               <div>___________</div>
               <div style={{ width: 200 }}>{abonentData.fio}</div>
             </div>
+            <br />
+            <br />
             <div style={{ display: "flex", justifyContent: "space-between" }}>
               <div style={{ width: 300 }}>{mahalla.name} МФЙ раиси:</div>
               <div>___________</div>
@@ -357,8 +382,6 @@ const CreateDalolatnoma = () => {
             </p>
           </div>
         ) : documentType == "dvaynik" ? (
-          "Dvaynik dalolatnoma va ariza"
-        ) : (
           <div id="print" ref={componentRef}>
             <p style={{ textAlign: "center" }}>
               <b>ДАЛОЛАТНОМА</b>
@@ -376,7 +399,12 @@ const CreateDalolatnoma = () => {
               </div>
               <div>Каттақўрғон тумани</div>
             </div>
-            <p>
+            <p
+              style={{
+                textAlign: "justify",
+                textIndent: "40px",
+              }}
+            >
               Биз қуйидаги имзо чекувчилар, Самарқанд вилояти, Каттакургон
               тумани, {mahalla.name} МФЙ раиси{" "}
               {`${mahalla.mfy_rais_name?.split(" ")[1][0]}. ${
@@ -387,7 +415,7 @@ const CreateDalolatnoma = () => {
               билан ишлаш бўлими бошлиғи Ш.Неъматуллаев мазкур далолатномани шу
               ҳақида туздик. МФЙ рўйхатини ўрганиш натижасида куйидаги абонент
             </p>
-            <table border={1} style={{ borderCollapse: "collapse" }}>
+            <StyledTable border={1} style={{ borderCollapse: "collapse" }}>
               <tr>
                 <th>Хакикий хисоб ракам</th>
                 <th>Абонент И.Ф.Ш</th>
@@ -400,8 +428,65 @@ const CreateDalolatnoma = () => {
                 <td>{abonentData2.licshet}</td>
                 <td>{abonentData2.fio}</td>
               </tr>
-            </table>
+            </StyledTable>
+            <p
+              style={{
+                textAlign: "justify",
+                textIndent: "40px",
+              }}
+            >
+              Ушбу абонентлар иккиламчи ҳисоб рақам бўлганлиги сабабли ягона
+              электрон тизимда иккиламчи хисоб ракамга тушган пул маблағларини
+              хақиқий ҳисоб рақамга ўтказиб, иккиламчи абонентларни ўчиришни
+              мақсадга мувофиқ деб ҳисоблаймиз.
+            </p>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div style={{ width: 300 }}>
+                "Анваржон бизнес инвест" МЧЖ Каттақўрғон туман филиали рахбари:
+              </div>
+              <div>___________</div>
+              <div style={{ width: 200 }}>А.Садриддинов</div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div style={{ width: 300 }}>
+                Абонентлар билан ишлаш бўлими ходими:
+              </div>
+              <div>___________</div>
+              <div style={{ width: 200 }}>Ш.Нематуллаев</div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div style={{ width: 300 }}>Ахоли назоратчиси:</div>
+              <div>___________</div>
+              <div style={{ width: 200 }}>
+                {mahalla.biriktirilganNazoratchi?.inspector_name}
+              </div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div style={{ width: 300 }}>Абонент:</div>
+              <div>___________</div>
+              <div style={{ width: 200 }}>{abonentData.fio}</div>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div style={{ width: 300 }}>{mahalla.name} МФЙ раиси:</div>
+              <div>___________</div>
+              <div style={{ width: 200 }}>{`${
+                mahalla.mfy_rais_name?.split(" ")[1][0]
+              }. ${mahalla.mfy_rais_name?.split(" ")[0]}`}</div>
+            </div>
+            {mahalla2 ? (
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div style={{ width: 300 }}>{mahalla.name} МФЙ раиси:</div>
+                <div>___________</div>
+                <div style={{ width: 200 }}>{`${
+                  mahalla.mfy_rais_name?.split(" ")[1][0]
+                }. ${mahalla.mfy_rais_name?.split(" ")[0]}`}</div>
+              </div>
+            ) : (
+              ""
+            )}
           </div>
+        ) : (
+          ""
         )}
       </div>
 
