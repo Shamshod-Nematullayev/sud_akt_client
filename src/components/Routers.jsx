@@ -18,6 +18,7 @@ import AddressToConvert from "./AddressToConvert/AddressToConvert";
 import Nazoratchilar from "../pages/Nazoratchilar";
 import CreateDalolatnoma from "../pages/CreateDalolatnoma";
 import AbarotkaChiqorish from "../pages/AborotkaChiqorish";
+import Test from "../pages/Test";
 
 const PrivateRoute = ({ element, ...props }) => {
   const isAuthenticated = useAuthStore((state) => state.user);
@@ -80,6 +81,7 @@ const AppRoutes = () => (
       path="/abarotkaChiqorish"
       element={<PrivateRoute element={<AbarotkaChiqorish />} />}
     />
+    <Route path="/test" element={<PrivateRoute element={<Test />} />} />
     <Route path="*" element={<NotFound />} />
   </Routes>
 );

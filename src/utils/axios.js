@@ -1,7 +1,8 @@
 import axios from "axios";
+import { host } from "./APIRouters";
 
 const api = axios.create({
-  baseURL: `http://192.168.1.121:8000`,
+  baseURL: host,
 });
 
 export default api;

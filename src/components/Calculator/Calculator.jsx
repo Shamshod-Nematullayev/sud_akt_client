@@ -87,6 +87,11 @@ export default function Calculator() {
     { month: 4, year: 2024, hisoblandi: 4625 },
     { month: 5, year: 2024, hisoblandi: 4625 },
     { month: 6, year: 2024, hisoblandi: 4625 },
+    { month: 7, year: 2024, hisoblandi: 4625 },
+    { month: 8, year: 2024, hisoblandi: 4625 },
+    { month: 9, year: 2024, hisoblandi: 4625 },
+    { month: 10, year: 2024, hisoblandi: 4625 },
+    { month: 11, year: 2024, hisoblandi: 4625 },
   ];
   const [currentTotal, setCurrentTotal] = useState(0);
   const [fromMoon, setFromMoon] = useState(1);
