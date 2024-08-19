@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
 import styled, { createGlobalStyle } from "styled-components";
+import { useEffect } from "react";
 
 const SpecialPageStyle = createGlobalStyle`
   @page {
@@ -50,6 +51,9 @@ const CreateDalolatnoma = () => {
   const [aniqlanganYashovchiSoni, setAniqlanganYashovchiSoni] = useState(0);
   const [ikkilamchiKod, setIkkilamchiKod] = useState("");
   const [documentType, setDocumentType] = useState("odam_soni"); // odam_soni, dvaynik, viza
+  const [printButtonDisabled, setPrintButtonDisabled] = useState(false);
+  const [arizaData, setArizaData] = useState({});
+
   const oylar = [
     "Январ",
     "Февраль",
@@ -80,20 +84,45 @@ const CreateDalolatnoma = () => {
     "Ўн икки",
   ];
 
+  async function createNewAriza() {
+    if (!(await getAbonentData(licshet))) return;
+    if (documentType == "odam_soni") {
+      setPrintButtonDisabled(false);
+      return toast.error(
+        "Hozircha odam soni o'zgartirish dalolatnomasi. Uchun bu funksiya yo'q"
+      );
+    } else if (documentType == "dvaynik") {
+      const respond = await axios.post(`${API.host}/api/arizalar/create`, {
+        asosiy_licshet: licshet,
+        ikkilamchi_licshet: ikkilamchiKod,
+        sana: Date.now(),
+        document_type: "dvaynik",
+        licshet: licshet,
+      });
+      if (!respond.data.ok) return toast.error(respond.data.message);
+      setArizaData(respond.data.ariza);
+    }
+  }
+  useEffect(() => {
+    setPrintButtonDisabled(true);
+  }, [documentType]);
+
   async function getAbonentData(licshet) {
     try {
       setIsLoading(true);
       let respond2;
       if (!licshet) {
         setIsLoading(false);
-        return toast.error(`Kod o'rni bo'sh`);
+        toast.error(`Kod o'rni bo'sh`);
+        return false;
       }
       const respond = await axios.get(
         `${API.host}/api/billing/get-abonent-dxj-by-licshet/${licshet}`
       );
       if (!respond.data.ok) {
         setIsLoading(false);
-        return toast.error(respond.data.message);
+        toast.error(respond.data.message);
+        return false;
       }
       const mfy_data = await axios.get(
         `${API.host}/api/billing/get-mfy-by-id/${respond.data.abonentData.mahallas_id}`
@@ -103,14 +132,16 @@ const CreateDalolatnoma = () => {
       if (documentType == "dvaynik") {
         if (!ikkilamchiKod) {
           setIsLoading(false);
-          return toast.error(`Ikkilamchi kod o'rni bo'sh`);
+          toast.error(`Ikkilamchi kod o'rni bo'sh`);
+          return false;
         }
         respond2 = await axios.get(
           `${API.host}/api/billing/get-abonent-dxj-by-licshet/${ikkilamchiKod}`
         );
         if (!respond2.data.ok) {
           setIsLoading(false);
-          return toast.error(respond.data.message);
+          toast.error(respond.data.message);
+          return false;
         }
         setAbonentData2(respond2.data.abonentData);
 
@@ -124,6 +155,7 @@ const CreateDalolatnoma = () => {
           setMahalla2(mfy_data.data.data);
         }
       }
+      return true;
       setIsLoading(false);
     } catch (error) {
       console.error(error);
@@ -212,7 +244,11 @@ const CreateDalolatnoma = () => {
           <div style={{ display: "flex" }}>
             <ReactToPrint
               content={() => componentRef.current}
-              trigger={() => <Button variant="contained">Chop etish</Button>}
+              trigger={() => (
+                <Button disabled={printButtonDisabled} variant="contained">
+                  Chop etish
+                </Button>
+              )}
             />
             <Button
               variant="outlined"
@@ -228,6 +264,15 @@ const CreateDalolatnoma = () => {
               Clear
             </Button>
           </div>
+          <Button
+            style={{ margin: "5px 0" }}
+            variant="outlined"
+            color="success"
+            fullWidth
+            onClick={createNewAriza}
+          >
+            Ro'yxatga olish
+          </Button>
         </div>
         {documentType === "odam_soni" ? (
           <div id="print" ref={componentRef}>
