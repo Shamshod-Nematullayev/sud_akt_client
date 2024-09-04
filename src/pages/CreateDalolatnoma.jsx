@@ -19,6 +19,8 @@ import { createGlobalStyle } from "styled-components";
 import { useEffect } from "react";
 import Document from "../components/CreateDalolatnoma/Document";
 
+// Importlar
+
 const SpecialPageStyle = createGlobalStyle`
   @page {
     size: A4;
@@ -43,31 +45,95 @@ const CreateDalolatnoma = () => {
   const [registerButtonDisabled, setRegisterButtonDisabled] = useState(false);
   const [allInputDisabled, setAllInputDisabled] = useState(false);
   const [arizaData, setArizaData] = useState({});
+  const [aktSummasi, setAktSummasi] = useState(0);
 
   async function createNewAriza() {
     if (!(await getAbonentData(licshet))) return;
-    if (documentType === "odam_soni") {
-      setPrintButtonDisabled(false);
-      return toast.error(
-        "Hozircha odam soni o'zgartirish dalolatnomasi. Uchun bu funksiya yo'q"
-      );
-    } else if (documentType === "dvaynik") {
-      const respond = await axios.post(`${API.host}/api/arizalar/create`, {
-        asosiy_licshet: licshet,
-        ikkilamchi_licshet: ikkilamchiKod,
-        sana: Date.now(),
-        document_type: "dvaynik",
-        licshet: licshet,
-      });
-      if (!respond.data.ok) return toast.error(respond.data.message);
-      setArizaData(respond.data.ariza);
-      setRegisterButtonDisabled(true);
-      setAllInputDisabled(true);
-      return setPrintButtonDisabled(false);
-    } else {
-      toast.error("Noma'lum xujjat turi tanlangan");
+
+    switch (documentType) {
+      case "odam_soni":
+        try {
+          const respond = await axios.post(`${API.host}/api/arizalar/create`, {
+            sana: Date.now(),
+            document_type: "odam_soni",
+            licshet: licshet,
+            comment: asoslantiruvchi,
+            aktSummasi: aktSummasi,
+            current_prescribed_cnt: abonentData.prescribed_cnt,
+            next_prescribed_cnt: aniqlanganYashovchiSoni,
+          });
+
+          if (!respond.data.ok) {
+            return toast.error(respond.data.message);
+          }
+
+          setArizaData(respond.data.ariza);
+          setRegisterButtonDisabled(true);
+          setAllInputDisabled(true);
+          setPrintButtonDisabled(false);
+        } catch (error) {
+          toast.error("Xatolik yuz berdi, iltimos qayta urinib ko'ring");
+          setPrintButtonDisabled(false);
+        }
+        break;
+
+      case "dvaynik":
+        try {
+          const respond = await axios.post(`${API.host}/api/arizalar/create`, {
+            asosiy_licshet: licshet,
+            ikkilamchi_licshet: ikkilamchiKod,
+            sana: Date.now(),
+            document_type: "dvaynik",
+            licshet: licshet,
+            comment: asoslantiruvchi,
+            aktSummasi: aktSummasi,
+          });
+
+          if (!respond.data.ok) {
+            return toast.error(respond.data.message);
+          }
+
+          setArizaData(respond.data.ariza);
+          setRegisterButtonDisabled(true);
+          setAllInputDisabled(true);
+          setPrintButtonDisabled(false);
+        } catch (error) {
+          toast.error("Xatolik yuz berdi, iltimos qayta urinib ko'ring");
+          setPrintButtonDisabled(false);
+        }
+        break;
+
+      case "viza":
+        try {
+          if (aktSummasi === 0) {
+            setPrintButtonDisabled(false);
+            return toast.error(`Akt summasi ko'rsatilmagan!`);
+          }
+          const respond = await axios.post(`${API.host}/api/arizalar/create`, {
+            sana: Date.now(),
+            document_type: "viza",
+            licshet: licshet,
+            comment: asoslantiruvchi,
+            aktSummasi: aktSummasi,
+          });
+          if (!respond.data.ok) {
+            return toast.error(respond.data.message);
+          }
+          setArizaData(respond.data.ariza);
+          setRegisterButtonDisabled(true);
+          setAllInputDisabled(true);
+          setPrintButtonDisabled(false);
+        } catch (e) {
+          toast.error("Xatolik yuz berdi, iltimos qayta urinib ko'ring");
+          setPrintButtonDisabled(false);
+        }
+        break;
+
+      default:
+        toast.error("Noma'lum xujjat turi tanlangan");
     }
   }
+
   useEffect(() => {
     setPrintButtonDisabled(true);
   }, [documentType]);
@@ -141,20 +207,32 @@ const CreateDalolatnoma = () => {
     setPrintButtonDisabled(true);
     setRegisterButtonDisabled(false);
     setArizaData({});
+    setAktSummasi(0);
   }
 
   return (
     <div className="admin-page">
       <SpecialPageStyle />
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={isLoading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
       {/* Yuklanmoqda loader */}
       <SideBar active="qulayliklar" />
-      <div className="container" style={{ display: "flex" }}>
+      <div
+        className="container"
+        style={{ display: "flex", position: "relative" }}
+      >
+        <Backdrop
+          sx={{
+            position: "absolute",
+            color: "#fff",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+          }}
+          open={isLoading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
         <div
           id="filter"
           style={{ padding: "10px 20px", margin: "0 25px", background: "#fff" }}
@@ -206,6 +284,9 @@ const CreateDalolatnoma = () => {
               onChange={(e) => setAniqlanganYashovchiSoni(e.target.value)}
             />
           ) : (
+            ""
+          )}
+          {documentType === "dvaynik" ? (
             <TextField
               label="Ikkilamchi kod"
               type="text"
@@ -216,7 +297,21 @@ const CreateDalolatnoma = () => {
               value={ikkilamchiKod}
               onChange={(e) => setIkkilamchiKod(e.target.value)}
             />
+          ) : (
+            ""
           )}
+          <div>
+            <TextField
+              label="Akt summasi"
+              type="text"
+              placeholder="0"
+              style={{ margin: "5px 0" }}
+              fullWidth
+              disabled={allInputDisabled}
+              value={aktSummasi}
+              onChange={(e) => setAktSummasi(e.target.value)}
+            />
+          </div>
           <TextareaAutosize
             placeholder="Asoslantiruvchi"
             type="text"

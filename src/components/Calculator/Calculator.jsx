@@ -17,6 +17,7 @@ import axios from "axios";
 import { getNextIncomingDocNum, createFullAkt } from "../../utils/APIRouters";
 import { toast } from "react-toastify";
 import DataTable from "./DataTable";
+import InputCalculator from "./InputCalculator";
 const APIs = require("../../utils/APIRouters");
 
 export default function Calculator() {
@@ -549,6 +550,20 @@ export default function Calculator() {
             </div>
             <div style={{ margin: "40px 60px" }}>
               <DataTable rows={rows} />
+            </div>
+            <div
+              style={{
+                height: 600,
+                flexDirection: "column",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+              }}
+            >
+              <div>
+                <InputCalculator />
+                <InputCalculator />
+              </div>
             </div>
           </div>
 

@@ -1,6 +1,5 @@
-import { Button, Modal } from "@mui/material";
+import { Button } from "@mui/material";
 import React from "react";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import SideBar from "../components/SideBar";
 
@@ -38,6 +37,11 @@ export default function Qulayliklar() {
           <Link to="/abarotkaChiqorish">
             <Button color="secondary" variant="contained">
               Abarotka chiqarish
+            </Button>
+          </Link>
+          <Link to="/arizalarImport">
+            <Button color="secondary" variant="contained">
+              Arizalar import
             </Button>
           </Link>
         </div>

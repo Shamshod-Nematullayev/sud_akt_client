@@ -9,7 +9,6 @@ import {
   Radio,
   RadioGroup,
 } from "@mui/material";
-import { display } from "@mui/system";
 import { DataGrid } from "@mui/x-data-grid";
 import React, { useEffect, useState } from "react";
 import SideBar from "../components/SideBar";
@@ -23,7 +22,6 @@ import axios from "axios";
 
 export default function Nazoratchilar() {
   const [rows, setRows] = useState([]); // State to hold rows data
-  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
   const [mahallalar, setMahallalar] = useState([]); // State for loading indicator
   const [activeInspector, setActiveInspector] = useState(false); // State for chosen inspector
   const [activeMFY, setActiveMFY] = useState(false); // State for chosen mfy
@@ -33,7 +31,6 @@ export default function Nazoratchilar() {
   const [radioBtnValue, setRadioBtnValue] = useState(false);
 
   const fetchData = async () => {
-    setIsLoading(true);
     try {
       const response = await fetch(host + "/api/inspectors"); // Replace with your endpoint
       const data = await response.json();
@@ -51,8 +48,6 @@ export default function Nazoratchilar() {
       setMahallalar(data.mahallalar);
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
-      setIsLoading(false);
     }
   };
   useEffect(() => {
