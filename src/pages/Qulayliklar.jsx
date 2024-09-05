@@ -2,8 +2,11 @@ import { Button } from "@mui/material";
 import React from "react";
 import { Link } from "react-router-dom";
 import SideBar from "../components/SideBar";
+import arizalarArxivFileStore from "../store/arizalarArxivFileStore";
 
 export default function Qulayliklar() {
+  const arizalarArxivFile = arizalarArxivFileStore();
+  console.log(arizalarArxivFile.file);
   return (
     <div className="admin-page">
       {/* Yuklanmoqda loader */}

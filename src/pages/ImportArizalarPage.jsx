@@ -11,10 +11,49 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import MainFileInput from "../components/ImportArizalar/MainFileInput";
+import arizalarArxivFileStore from "../store/arizalarArxivFileStore";
+import { toast } from "react-toastify";
+import JSZip from "jszip";
+import { Paper } from "@mui/material";
+import SelectionListFiles from "../components/ImportArizalar/SelectionListFiles";
 
 export default function ImportArizalarPage() {
   const [showBackdrop, setShowBackdrop] = useState(false);
   const [showModal, setShowModal] = useState(true);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const { file, setData, pdfFiles, setPdfFiles } = arizalarArxivFileStore();
+
+  // handle functions
+  const handleSubmit = async (event) => {
+    if (!selectedFile) return toast.error(`file not selected`);
+
+    // setShowBackdrop(true);
+    setShowModal(false);
+    setData(selectedFile);
+    const zip = await JSZip.loadAsync(selectedFile);
+    const filesPromises = [];
+    console.log(zip);
+
+    for (const property in zip.files) {
+      const file = zip.files[property];
+      if (file.name.toLowerCase().endsWith(".pdf")) {
+        filesPromises.push(
+          file.async("arraybuffer").then((arrayBuffer) => {
+            const pdfBlob = new Blob([arrayBuffer], {
+              type: "application/pdf",
+            });
+            const url = URL.createObjectURL(pdfBlob);
+            return { name: file.name, url };
+          })
+        );
+      }
+    }
+
+    const files = await Promise.all(filesPromises);
+    setPdfFiles(files);
+    console.log({ files });
+  };
+
   return (
     <div className="admin-page">
       {/* Arxivlangan faylni yuklab olish uchun modal oyna */}
@@ -27,9 +66,13 @@ export default function ImportArizalarPage() {
         <DialogContent>
           <DialogContentText id="dialog-description">
             Bu yerga Xadsen tizimiga ro'yxatdan o'tkazilgan arizalarning PDF
-            filelaridan iborat bo'lgan RAR arxiv fayli yuklanishi kerak
+            filelaridan iborat bo'lgan RAR arxiv fayli yuklanishi kerak{" "}
+            {file ? file.name : ""}
           </DialogContentText>
-          <MainFileInput />
+          <MainFileInput
+            selectedFile={selectedFile}
+            setSelectedFile={setSelectedFile}
+          />
         </DialogContent>
         <DialogActions>
           <Link to="/qulayliklar">
@@ -37,7 +80,7 @@ export default function ImportArizalarPage() {
               Chiqish
             </Button>
           </Link>
-          <Button onClick={"to do"} variant="outlined" color="success">
+          <Button onClick={handleSubmit} variant="outlined" color="success">
             yuklash
           </Button>
         </DialogActions>
@@ -51,6 +94,31 @@ export default function ImportArizalarPage() {
       </Backdrop>
       <SideBar active="qulayliklar" />
       <div className="container">
+        {pdfFiles.length > 0 && (
+          <div>
+            {pdfFiles.map((file, index) => (
+              <div key={index}>
+                <iframe
+                  src={file.url}
+                  width="30%"
+                  height="60%"
+                  title={file.name}
+                  style={{ position: "absolute", right: 0, top: "40%" }}
+                ></iframe>
+              </div>
+            ))}
+            <Paper
+              sx={{
+                position: "absolute",
+                right: 0,
+                width: "30%",
+                height: "40%",
+              }}
+            >
+              <SelectionListFiles />
+            </Paper>
+          </div>
+        )}
         <ImportArizalar />
       </div>
     </div>

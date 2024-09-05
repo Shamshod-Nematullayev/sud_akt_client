@@ -6,7 +6,9 @@ const FileInput = styled("input")({
   display: "none",
 });
 
-const DropZone = styled(Paper)(({ theme, isDragging, isValidFile }) => ({
+const DropZone = styled(({ isValidFile, isDragging, ...otherProps }) => (
+  <Paper {...otherProps} />
+))(({ theme, isDragging, isValidFile }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
@@ -15,31 +17,30 @@ const DropZone = styled(Paper)(({ theme, isDragging, isValidFile }) => ({
   border: `2px dashed ${
     isDragging
       ? isValidFile
-        ? theme.palette.error.main
-        : theme.palette.primary.main
+        ? theme.palette.primary.main
+        : theme.palette.error.main
       : theme.palette.grey[500]
   }`,
   backgroundColor: isDragging
     ? isValidFile
-      ? theme.palette.error.light
-      : theme.palette.action.hover
+      ? theme.palette.action.hover
+      : theme.palette.error.light
     : theme.palette.background.default,
   transition: "background-color 0.3s, border-color 0.3s",
   cursor: "pointer",
   textAlign: "center",
 }));
 
-const MainFileInput = () => {
+const MainFileInput = ({ selectedFile, setSelectedFile }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isValidFile, setIsValidFile] = useState(true);
-  const [selectedFile, setSelectedFile] = useState(null);
 
   const handleDragOver = (event) => {
     event.preventDefault();
     const file =
       event.dataTransfer.items[0]?.getAsFile() || event.dataTransfer.files[0];
     if (file) {
-      setIsValidFile(file.name.endsWith(".rar"));
+      setIsValidFile(file.name.endsWith(".zip"));
     }
     setIsDragging(true);
   };
@@ -53,7 +54,7 @@ const MainFileInput = () => {
     setIsDragging(false);
     const file = event.dataTransfer.files[0];
     if (file) {
-      if (file.name.endsWith(".rar")) {
+      if (file.name.endsWith(".zip")) {
         setSelectedFile(file);
         setIsValidFile(true);
       } else {
@@ -72,7 +73,7 @@ const MainFileInput = () => {
       <FileInput
         type="file"
         id="file-upload"
-        accept=".rar"
+        accept=".zip"
         onChange={handleFileSelect}
       />
       <label htmlFor="file-upload" style={{ width: "100%" }}>
