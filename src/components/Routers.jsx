@@ -20,6 +20,7 @@ import CreateDalolatnoma from "../pages/CreateDalolatnoma";
 import AbarotkaChiqorish from "../pages/AborotkaChiqorish";
 import Test from "../pages/Test";
 import ImportArizalarPage from "../pages/ImportArizalarPage";
+import DvaynikOchirishPage from "./DvaynikOchirishPage";
 
 const PrivateRoute = ({ element, ...props }) => {
   const isAuthenticated = useAuthStore((state) => state.user);
@@ -85,6 +86,10 @@ const AppRoutes = () => (
     <Route
       path="/arizalarImport"
       element={<PrivateRoute element={<ImportArizalarPage />} />}
+    />
+    <Route
+      path="/dvayniklarUchirish"
+      element={<PrivateRoute element={<DvaynikOchirishPage />} />}
     />
     <Route path="/test" element={<PrivateRoute element={<Test />} />} />
     <Route path="*" element={<NotFound />} />

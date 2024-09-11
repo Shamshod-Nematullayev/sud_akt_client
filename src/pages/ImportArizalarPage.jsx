@@ -16,12 +16,14 @@ import { toast } from "react-toastify";
 import JSZip from "jszip";
 import { Paper } from "@mui/material";
 import SelectionListFiles from "../components/ImportArizalar/SelectionListFiles";
+import useLoaderStore from "../store/loadingStore";
 
 export default function ImportArizalarPage() {
-  const [showBackdrop, setShowBackdrop] = useState(false);
+  const { isLoading } = useLoaderStore();
   const [showModal, setShowModal] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
-  const { file, setData, pdfFiles, setPdfFiles } = arizalarArxivFileStore();
+  const { file, setData, currentPdf, setPdfFiles, setZipFiles } =
+    arizalarArxivFileStore();
 
   // handle functions
   const handleSubmit = async (event) => {
@@ -31,8 +33,8 @@ export default function ImportArizalarPage() {
     setShowModal(false);
     setData(selectedFile);
     const zip = await JSZip.loadAsync(selectedFile);
+    setZipFiles(zip.files);
     const filesPromises = [];
-    console.log(zip);
 
     for (const property in zip.files) {
       const file = zip.files[property];
@@ -51,7 +53,6 @@ export default function ImportArizalarPage() {
 
     const files = await Promise.all(filesPromises);
     setPdfFiles(files);
-    console.log({ files });
   };
 
   return (
@@ -75,6 +76,13 @@ export default function ImportArizalarPage() {
           />
         </DialogContent>
         <DialogActions>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => setShowModal(false)}
+          >
+            Bekor qilish
+          </Button>
           <Link to="/qulayliklar">
             <Button variant="outlined" color="error">
               Chiqish
@@ -88,37 +96,29 @@ export default function ImportArizalarPage() {
       {/* Yuklanmoqda loader */}
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={showBackdrop}
+        open={isLoading}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
       <SideBar active="qulayliklar" />
       <div className="container">
-        {pdfFiles.length > 0 && (
-          <div>
-            {pdfFiles.map((file, index) => (
-              <div key={index}>
-                <iframe
-                  src={file.url}
-                  width="30%"
-                  height="60%"
-                  title={file.name}
-                  style={{ position: "absolute", right: 0, top: "40%" }}
-                ></iframe>
-              </div>
-            ))}
-            <Paper
-              sx={{
-                position: "absolute",
-                right: 0,
-                width: "30%",
-                height: "40%",
-              }}
-            >
-              <SelectionListFiles />
-            </Paper>
-          </div>
-        )}
+        <Paper
+          sx={{
+            position: "absolute",
+            right: 0,
+            width: "30%",
+            height: "40%",
+          }}
+        >
+          <SelectionListFiles />
+        </Paper>
+        <iframe
+          src={currentPdf.url}
+          width="30%"
+          height="60%"
+          title={currentPdf.name}
+          style={{ position: "absolute", right: 0, top: "40%" }}
+        ></iframe>
         <ImportArizalar />
       </div>
     </div>

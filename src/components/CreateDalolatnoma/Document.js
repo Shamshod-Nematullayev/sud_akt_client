@@ -461,6 +461,66 @@ export default function Document({ props }) {
             </>
           )}
         </div>
+      ) : documentType === "death" ? (
+        <div id="print" ref={componentRef}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div></div>
+            <div
+              style={{
+                width: 300,
+                textAlign: "justify",
+                fontWeight: "bold",
+                textIndent: "40px",
+              }}
+            >
+              Каттақўрғон туман “Анваржон бизнес инвест” МЧЖ рахбари
+              А.А.Садриддиновга. Каттақўрғон туман {mahalla.name} МФЙ да яшовчи
+              фукаро {abonentData.fio} томонидан
+            </div>
+          </div>
+          <br />
+          <h1
+            style={{
+              textAlign: "center",
+              margin: "auto 0 0 0",
+              fontSize: "24px",
+            }}
+          >
+            АРИЗА
+          </h1>
+          <br />
+          <p
+            style={{
+              fontWeight: "bold",
+              lineHeight: "40px",
+              textIndent: "40px",
+            }}
+          >
+            Шуни ёзиб маълум қиламанки менинг {abonentData.licshet} хисоб
+            рақамим онлайн базага нотўғри хисоб китоб қилингани сабабли ўлим
+            гувоҳнома тақдим киляпман. Ушбу гувоҳнома асосида қайта хисоб китоб
+            қилиб беришингизни сурайман.
+          </p>
+          <p style={{ fontWeight: "bold", textAlign: "center" }}>
+            "{date.getDate()}" {oylar[date.getMonth()]} {date.getFullYear()} йил
+            _______ {abonentData.fio}
+          </p>
+          {!arizaData._id ? (
+            ""
+          ) : (
+            <>
+              <QRCodeCanvas
+                value={`ariza_${arizaData._id}_${arizaData.document_number}`}
+                size={150}
+                bgColor={"#ffffff"}
+                fgColor={"#000000"}
+                level={"Q"}
+                includeMargin={true}
+              />
+              <p>{arizaData.document_number}</p>
+            </>
+          )}
+        </div>
       ) : null}
     </>
   );

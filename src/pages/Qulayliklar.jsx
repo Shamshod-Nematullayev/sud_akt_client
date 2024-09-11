@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button, Paper } from "@mui/material";
 import React from "react";
 import { Link } from "react-router-dom";
 import SideBar from "../components/SideBar";
@@ -14,14 +14,16 @@ export default function Qulayliklar() {
 
       <div className="container">
         <div className="buttonsPanel">
-          <Button
-            color="error"
-            variant="contained"
-            data-bs-toggle=""
-            data-bs-target=""
-          >
-            Ikkilamchilarni o'chirish
-          </Button>
+          <Link to="/dvayniklarUchirish">
+            <Button
+              color="error"
+              variant="contained"
+              data-bs-toggle=""
+              data-bs-target=""
+            >
+              Ikkilamchilarni o'chirish
+            </Button>
+          </Link>
           <Link to="/calculator">
             <Button color="secondary" variant="contained">
               Kalkulyator

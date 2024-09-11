@@ -1,4 +1,4 @@
-module.exports.host = `http://192.168.1.121:5000`;
+module.exports.host = `http://192.168.1.138:5000`;
 module.exports.loginAPI = `${this.host}/api/auth/login`;
 module.exports.sudAkts = `${this.host}/api/sudAkts`;
 module.exports.bildirgilar = `${this.host}/api/bildirgilar`;
@@ -10,3 +10,7 @@ module.exports.documents = `${this.host}/api/documents/`;
 module.exports.getNextIncomingDocNum = `${this.host}/api/billing/next-incoming-document-number/`;
 module.exports.createFullAkt = `${this.host}/api/billing/create-full-akt/`;
 module.exports.getDXJ = `${this.host}/api/billing/get-abonent-dxj-by-licshet/`;
+module.exports.get_abonent_data_by_licshet = `${this.host}/api/billing/get-abonent-data-by-licshet/`; // params: licshet
+module.exports.scan_ariza_qr = `${this.host}/api/arizalar/scan_ariza_qr/`;
+module.exports.get_ariza_by_id = `${this.host}/api/arizalar/get-ariza-by-id/`; // params: _id
+module.exports.cancel_ariza_by_id = `${this.host}/api/arizalar/cancel-ariza-by-id/`; // body: _id, canceling_description

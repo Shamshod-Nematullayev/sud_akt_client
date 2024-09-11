@@ -40,7 +40,7 @@ const CreateDalolatnoma = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [aniqlanganYashovchiSoni, setAniqlanganYashovchiSoni] = useState(0);
   const [ikkilamchiKod, setIkkilamchiKod] = useState("");
-  const [documentType, setDocumentType] = useState("odam_soni"); // odam_soni, dvaynik, viza
+  const [documentType, setDocumentType] = useState("odam_soni"); // odam_soni, dvaynik, viza, death
   const [printButtonDisabled, setPrintButtonDisabled] = useState(true);
   const [registerButtonDisabled, setRegisterButtonDisabled] = useState(false);
   const [allInputDisabled, setAllInputDisabled] = useState(false);
@@ -128,6 +128,39 @@ const CreateDalolatnoma = () => {
           setPrintButtonDisabled(false);
         }
         break;
+      case "death":
+        if (
+          aktSummasi === 0 &&
+          aniqlanganYashovchiSoni === abonentData.prescribed_cnt
+        ) {
+          setPrintButtonDisabled(false);
+          return toast.error(
+            `Akt summasi yo'q, yashovchi soni ham o'zgartirilmayapti!`
+          );
+        }
+        try {
+          const respond = await axios.post(`${API.host}/api/arizalar/create`, {
+            sana: Date.now(),
+            document_type: "death",
+            licshet: licshet,
+            comment: asoslantiruvchi,
+            aktSummasi: aktSummasi,
+            current_prescribed_cnt: abonentData.prescribed_cnt,
+            next_prescribed_cnt: aniqlanganYashovchiSoni,
+          });
+
+          if (!respond.data.ok) {
+            return toast.error(respond.data.message);
+          }
+
+          setArizaData(respond.data.ariza);
+          setRegisterButtonDisabled(true);
+          setAllInputDisabled(true);
+          setPrintButtonDisabled(false);
+        } catch (error) {
+          toast.error("Xatolik yuz berdi, iltimos qayta urinib ko'ring");
+          setPrintButtonDisabled(false);
+        }
 
       default:
         toast.error("Noma'lum xujjat turi tanlangan");
@@ -248,6 +281,7 @@ const CreateDalolatnoma = () => {
             <MenuItem value="odam_soni">Одам сони</MenuItem>
             <MenuItem value="dvaynik">Двайник</MenuItem>
             <MenuItem value="viza">Виза</MenuItem>
+            <MenuItem value="death">Ўлим гувоҳномаси</MenuItem>
           </Select>
           <div style={{ display: "flex", position: "relative", width: 200 }}>
             <TextField
@@ -272,7 +306,7 @@ const CreateDalolatnoma = () => {
               <CachedIcon />
             </Button>
           </div>
-          {documentType === "odam_soni" ? (
+          {documentType === "odam_soni" || documentType === "death" ? (
             <TextField
               label="Yashov soni"
               type="text"
