@@ -23,6 +23,8 @@ const APIs = require("../../utils/APIRouters");
 
 export default function Calculator() {
   const [currentTotal, setCurrentTotal] = useState(0);
+  const [currentNds, setCurrentNds] = useState(0);
+  const [ndsTotal, setNdsTotal] = useState(0);
   const [fromMoon, setFromMoon] = useState(1);
   const [fromYear, setFromYear] = useState(2019);
   const [toMoon, setToMoon] = useState(2);
@@ -50,12 +52,14 @@ export default function Calculator() {
       {
         name: `${fromMoon}.${fromYear}-${toMoon}.${toYear}`,
         summ: currentTotal,
+        nds: currentNds,
       },
     ]);
   };
 
   const qaytaHisob = ({ fromMoon, fromYear, toMoon, toYear, yashovchilar }) => {
     let summ = 0;
+    let nds = 0;
     for (let i = 0; i < hisoblandiJadval.length; i++) {
       const davr = hisoblandiJadval[i];
 
@@ -67,18 +71,25 @@ export default function Calculator() {
           davr.year < toYear ||
           (davr.year == toYear && davr.month <= toMoon)
         ) {
+          if (davr.nds) {
+            nds += davr.nds * yashovchilar;
+          }
           summ += davr.hisoblandi * yashovchilar;
         }
       }
     }
+    setCurrentNds(nds);
     setCurrentTotal(summ);
   };
   useEffect(() => {
     let total = 0;
+    let nds = 0;
     countes.forEach((count) => {
       total += count.summ;
+      nds += count.nds;
     });
     setTotal(total);
+    setNdsTotal(nds);
   }, [countes]);
 
   const handleRefreshFromBilling = async () => {
@@ -451,6 +462,7 @@ export default function Calculator() {
                       yashovchilarUzgartirish: !yashovchiInputDisable,
                       qaytaHisobBuladi: !aktSummasiInputDisabled,
                       amount,
+                      nds_summ: ndsTotal,
                     },
                     {
                       headers: {
@@ -466,6 +478,7 @@ export default function Calculator() {
                   // setFileInputLabel("Choose file");
                   const res2 = await axios.get(getNextIncomingDocNum);
                   setAktNumber(res2.data.value);
+                  setCountes([]);
                   setCreateAktButtonDisabled(false);
                 }}
               >
@@ -503,7 +516,7 @@ export default function Calculator() {
               fontSize: 32,
             }}
           >
-            TOTAL: <b>{total}</b>
+            TOTAL: <b>{total}</b> NDS: {ndsTotal}
           </Typography>
         </Paper>
       </div>

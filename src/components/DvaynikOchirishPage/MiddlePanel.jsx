@@ -38,7 +38,7 @@ export default function MiddlePanel() {
             <ListItem className="li">
               QARZ:{" "}
               <span
-                className={Number(abonent1Data.saldo_k) > 0 ? "green" : "red"}
+                className={Number(abonent1Data.saldo_k) < 0 ? "green" : "red"}
               >
                 {abonent1Data.saldo_k}
               </span>
@@ -59,7 +59,7 @@ export default function MiddlePanel() {
             <ListItem className="li">
               QARZ:{" "}
               <span
-                className={Number(abonent2Data.saldo_k) > 0 ? "green" : "red"}
+                className={Number(abonent2Data.saldo_k) < 0 ? "green" : "red"}
               >
                 {abonent2Data.saldo_k}
               </span>

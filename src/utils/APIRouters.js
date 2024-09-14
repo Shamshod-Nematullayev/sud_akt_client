@@ -9,6 +9,7 @@ module.exports.pachkalar = `${this.host}/api/pachkalar/`;
 module.exports.documents = `${this.host}/api/documents/`;
 module.exports.getNextIncomingDocNum = `${this.host}/api/billing/next-incoming-document-number/`;
 module.exports.createFullAkt = `${this.host}/api/billing/create-full-akt/`;
+module.exports.createDvaynikAkt = `${this.host}/api/billing/create-dvaynik-akt/`;
 module.exports.getDXJ = `${this.host}/api/billing/get-abonent-dxj-by-licshet/`;
 module.exports.get_abonent_data_by_licshet = `${this.host}/api/billing/get-abonent-data-by-licshet/`; // params: licshet
 module.exports.scan_ariza_qr = `${this.host}/api/arizalar/scan_ariza_qr/`;
