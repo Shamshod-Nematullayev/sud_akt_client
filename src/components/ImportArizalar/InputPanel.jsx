@@ -7,7 +7,10 @@ import useLoaderStore from "../../store/loadingStore";
 import arizalarArxivFileStore from "../../store/arizalarArxivFileStore";
 const APIs = require("../../utils/APIRouters");
 
-export default function InputPanel() {
+export default function InputPanel({
+  handleCancelButtonClick,
+  createAktButtonDisabled,
+}) {
   const { setIsLoading } = useLoaderStore();
   const { abonent1Data, abonent2Data } = useDvayniklarStore();
   const { currentPdf, zipFiles, deleteOneFile, arizaData } =
@@ -177,6 +180,15 @@ export default function InputPanel() {
         fullWidth
       >
         Akt qilish
+      </Button>
+      <Button
+        variant="contained"
+        color="error"
+        onClick={handleCancelButtonClick}
+        disabled={createAktButtonDisabled}
+        fullWidth
+      >
+        Bekor qilish
       </Button>
     </div>
   );

@@ -673,7 +673,10 @@ export default function ImportArizalar() {
           </div>
         </div>
       ) : (
-        <InputPanel />
+        <InputPanel
+          handleCancelButtonClick={handleCancelButtonClick}
+          createAktButtonDisabled={createAktButtonDisabled}
+        />
       )}
       {arizaData.document_type !== "dvaynik" ? (
         <div>
