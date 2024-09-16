@@ -14,4 +14,5 @@ module.exports.getDXJ = `${this.host}/api/billing/get-abonent-dxj-by-licshet/`;
 module.exports.get_abonent_data_by_licshet = `${this.host}/api/billing/get-abonent-data-by-licshet/`; // params: licshet
 module.exports.scan_ariza_qr = `${this.host}/api/arizalar/scan_ariza_qr/`;
 module.exports.get_ariza_by_id = `${this.host}/api/arizalar/get-ariza-by-id/`; // params: _id
+module.exports.get_ariza_by_document_number = `${this.host}/api/arizalar/get-ariza-by-document-number/`; // params: document_number
 module.exports.cancel_ariza_by_id = `${this.host}/api/arizalar/cancel-ariza-by-id/`; // body: _id, canceling_description

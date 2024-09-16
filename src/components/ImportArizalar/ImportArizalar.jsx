@@ -24,11 +24,26 @@ import arizalarArxivFileStore from "../../store/arizalarArxivFileStore";
 import useLoaderStore from "../../store/loadingStore";
 import DataTable from "../Calculator/DataTable";
 import { hisoblandiJadval } from "../../utils/constants";
+import MiddlePanel from "./MiddlePanel";
+import useDvayniklarStore from "../../store/dvayniklarStore";
+import InputPanel from "./InputPanel";
 
 const APIs = require("../../utils/APIRouters");
 
 export default function ImportArizalar() {
   const { setIsLoading } = useLoaderStore();
+  const {
+    haqiqiyRaqam,
+    setHaqiqiyRaqam,
+    ikkilamchiRaqam,
+    setIkkilamchiRaqam,
+    abonent1Data,
+    abonent2Data,
+    setAbonent1Data,
+    setAbonent2Data,
+    items,
+    setItems,
+  } = useDvayniklarStore();
   const [arizaNumberDisabled, setArizaNumberDisabled] = useState(false);
   const [arizaNumber, setArizaNumber] = useState("");
   const [aktNumberDisabled, setAktNumberDisabled] = useState(false);
@@ -110,6 +125,8 @@ export default function ImportArizalar() {
               return toast.error(response.message);
             }
             if (response.result.split("_")[0] !== "ariza") {
+              setIsLoading(false);
+              setArizaNumberDisabled(false);
               return toast.error("Noma'lum QR kod");
             }
             let ariza = (
@@ -128,9 +145,8 @@ export default function ImportArizalar() {
                 "QR koddagi va bazadagi ariza raqamlari o'zaro mos emas"
               );
             }
-            await handleRefreshFromBilling();
             setIsLoading(false);
-            setArizaDataHandler(ariza);
+            await setArizaDataHandler(ariza);
           });
       }
     }
@@ -145,29 +161,132 @@ export default function ImportArizalar() {
     setNdsSumma(summ);
   }, [ndsItems]);
 
-  function setArizaDataHandler(ariza) {
+  async function setArizaDataHandler(ariza) {
     setArizaData(ariza);
+    const diffMonth = counterDiffMonth(new Date(ariza.sana));
     switch (ariza.document_type) {
       case "viza":
         set_prescribed_cnt("");
         setYashovchiInputDisable(true);
-        setAktSummasiInputDisabled(false);
         setAmount(ariza.aktSummasi);
+        setAktSummasiInputDisabled(false);
         setLicshet(ariza.licshet);
         setArizaNumberDisabled(true);
         setArizaNumber(ariza.document_number);
         setComment("Pasport vizalari: " + ariza.comment);
         setCreateAktButtonDisabled(false);
+        await handleRefreshFromBilling();
+        setIsLoading(false);
+        break;
+      case "death":
+        if (ariza.next_prescribed_cnt != ariza.current_prescribed_cnt) {
+          set_prescribed_cnt(ariza.next_prescribed_cnt);
+          setYashovchiInputDisable(false);
+        } else setYashovchiInputDisable(true);
+        setAmount(
+          ariza.aktSummasi +
+            (ariza.current_prescribed_cnt - ariza.next_prescribed_cnt) *
+              4625 *
+              diffMonth
+        );
+        if (
+          ariza.aktSummasi +
+            (ariza.current_prescribed_cnt - ariza.next_prescribed_cnt) *
+              4625 *
+              diffMonth >
+          0
+        ) {
+          setAktSummasiInputDisabled(false);
+        } else setAktSummasiInputDisabled(true);
+        setLicshet(ariza.licshet);
+        setArizaNumberDisabled(true);
+        setArizaNumber(ariza.document_number);
+        setComment("O'lim guvohnomasi: " + ariza.comment);
+        setCreateAktButtonDisabled(false);
+        await handleRefreshFromBilling(ariza.licshet);
+        break;
+      case "odam_soni":
+        if (ariza.next_prescribed_cnt != ariza.current_prescribed_cnt) {
+          set_prescribed_cnt(ariza.next_prescribed_cnt);
+          setYashovchiInputDisable(false);
+        } else setYashovchiInputDisable(true);
+        setAmount(
+          ariza.aktSummasi +
+            (ariza.current_prescribed_cnt - ariza.next_prescribed_cnt) *
+              4625 *
+              diffMonth
+        );
+        if (
+          ariza.aktSummasi +
+            (ariza.current_prescribed_cnt - ariza.next_prescribed_cnt) *
+              4625 *
+              diffMonth >
+          0
+        ) {
+          setAktSummasiInputDisabled(false);
+        } else setAktSummasiInputDisabled(true);
+        setLicshet(ariza.licshet);
+        setArizaNumberDisabled(true);
+        setArizaNumber(ariza.document_number);
+        setComment("MFY dalolatnomasi: " + ariza.comment);
+        setCreateAktButtonDisabled(false);
+        await handleRefreshFromBilling(ariza.licshet);
+        break;
+      case "dvaynik":
+        const result = await axios.get(APIs.getDXJ + ariza.asosiy_licshet);
+        if (result.data.ok) {
+          let jamiSumm = 0;
+          result.data.rows.forEach((row) => {
+            jamiSumm +=
+              Number(row.postup_kvit) +
+              Number(row.postup_munis) +
+              Number(row.postup_plat) +
+              Number(row.postup_rp);
+          });
+          setAbonent1Data({ ...result.data.abonentData, tushum: jamiSumm });
+        } else {
+          toast.error(result.data.message);
+          setIsLoading(false);
+          return false;
+        }
+        const result2 = await axios.get(APIs.getDXJ + ariza.ikkilamchi_licshet);
+        if (result2.data.ok) {
+          setIsLoading(false);
+          let jamiSumm = 0;
+          result2.data.rows.forEach((row) => {
+            jamiSumm +=
+              Number(row.postup_kvit) +
+              Number(row.postup_munis) +
+              Number(row.postup_plat) +
+              Number(row.postup_rp);
+          });
+          setAbonent2Data({ ...result2.data.abonentData, tushum: jamiSumm });
+          return true;
+        } else {
+          setIsLoading(false);
+          toast.error(result2.data.message);
+          return false;
+        }
         break;
     }
   }
+  const counterDiffMonth = function (initialDate) {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    const initialYear = initialDate.getFullYear();
+    const initialMonth = initialDate.getMonth();
+    return (currentYear - initialYear) * 12 - (currentMonth - initialMonth);
+  };
 
   // handler functions
-  const handleRefreshFromBilling = async () => {
-    if (licshet == "") {
+  const handleRefreshFromBilling = async (licsh) => {
+    setIsLoading(true);
+    if (licshet == "" && !licsh) {
       return toast.error("Hisob raqami bo'sh");
     }
-    const result = await axios.get(APIs.getDXJ + licshet);
+    let kod = licsh || licshet;
+    const result = await axios.get(APIs.getDXJ + kod);
     if (result.data.ok) {
       const data = result.data.rows.map((data, i) => {
         return {
@@ -194,9 +313,15 @@ export default function ImportArizalar() {
     } else {
       toast.error(result.data.message);
     }
+    setIsLoading(false);
   };
 
   const parseToPdfBlob = async (data) => {
+    console.log();
+    if (data._data.uncompressedSize / (1024 * 1024) > 10) {
+      toast.error(`Fayl 10Mb-dan ko'p bo'lishi mumkin emas.`);
+      return false;
+    }
     return data.async("arraybuffer").then(async (arrayBuffer) => {
       const pdfBlob = new Blob([arrayBuffer], {
         type: "application/pdf",
@@ -209,11 +334,13 @@ export default function ImportArizalar() {
     if (!zipFiles[currentPdf.name]) {
       return toast.error(`Fayl tanlanmagan`);
     }
+    const fileBlob = await parseToPdfBlob(zipFiles[currentPdf.name]);
+    if (!fileBlob) return;
     setCreateAktButtonDisabled(true);
-    await axios.post(
+    const result = await axios.post(
       createFullAkt,
       {
-        file: await parseToPdfBlob(zipFiles[currentPdf.name]),
+        file: fileBlob,
         autoAktNumber: aktNumberDisabled,
         akt_number: aktNumber,
         comment,
@@ -233,13 +360,31 @@ export default function ImportArizalar() {
       }
     );
     await handleRefreshFromBilling();
-    set_prescribed_cnt("");
-    setAmount("");
-    setLicshet("");
-    deleteOneFile(currentPdf.name);
-    const res2 = await axios.get(getNextIncomingDocNum);
-    setAktNumber(res2.data.value);
+    if (result.data.ok) {
+      set_prescribed_cnt("");
+      setAmount("");
+      setLicshet("");
+      deleteOneFile(currentPdf.name);
+      const res2 = await axios.get(getNextIncomingDocNum);
+      setAktNumber(res2.data.value);
+    } else {
+      toast.error(result.data.message);
+    }
     setCreateAktButtonDisabled(false);
+  };
+  const handleArizaRefreshButtonClick = async (event) => {
+    setIsLoading(true);
+    const res = await axios.get(
+      APIs.get_ariza_by_document_number + arizaNumber
+    );
+
+    if (!res.data.ok) {
+      setIsLoading(false);
+      toast.error(res.data.message);
+      return false;
+    }
+    setArizaDataHandler(res.data.ariza);
+    setIsLoading(false);
   };
 
   const handleCancelButtonClick = (event) => {
@@ -315,160 +460,165 @@ export default function ImportArizalar() {
         justifyContent: "left",
       }}
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          width: "250px",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <Switch
-            defaultChecked={false}
-            checked={arizaNumberDisabled}
-            disabled={arizaNumberControlSwitchDisabled}
-            onChange={async (e) => {
-              if (e.target.checked) {
-                setArizaNumberDisabled(true);
-              } else {
-                setArizaNumber("");
-                setArizaNumberDisabled(false);
-              }
-            }}
-          />
-          <TextField
-            placeholder="Ariza №"
-            label="Ariza №"
-            type="number"
-            inputProps={{ inputMode: "numeric" }}
-            disabled={arizaNumberDisabled}
-            value={arizaNumber}
-            onChange={(e) => setArizaNumber(e.target.value)}
+      {arizaData.document_type !== "dvaynik" ? (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            width: "250px",
+          }}
+        >
+          <div
             style={{
-              width: "80%",
+              display: "flex",
+              alignItems: "center",
+              margin: "15px 0 0 0",
             }}
-          />
-        </div>
-        <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
-          <Switch
-            defaultChecked={false}
-            onChange={async (e) => {
-              if (e.target.checked) {
-                setAktNumberDisabled(true);
-                const res = await axios.get(getNextIncomingDocNum);
-                setAktNumber(res.data.value);
-              } else {
-                setAktNumber("");
-                setAktNumberDisabled(false);
-              }
-            }}
-          />
-          <TextField
-            placeholder="AKT №"
-            label="AKT №"
-            type="number"
-            inputProps={{ inputMode: "numeric" }}
-            disabled={aktNumberDisabled}
-            value={aktNumber}
-            onChange={(e) => setAktNumber(e.target.value)}
-            style={{
-              width: "80%",
-            }}
-          />
-        </div>
+          >
+            <IconButton
+              variant="contained"
+              onClick={() => handleArizaRefreshButtonClick()}
+              disabled={refreshButtonDisabled}
+              style={{
+                height: "55px",
+                width: "50px",
+              }}
+            >
+              <CachedIcon />
+            </IconButton>
+            <TextField
+              placeholder="Ariza №"
+              label="Ariza №"
+              type="number"
+              inputProps={{ inputMode: "numeric" }}
+              disabled={arizaNumberDisabled}
+              value={arizaNumber}
+              onChange={(e) => setArizaNumber(e.target.value)}
+              style={{
+                width: "80%",
+              }}
+            />
+          </div>
+          <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
+            <Switch
+              defaultChecked={false}
+              onChange={async (e) => {
+                if (e.target.checked) {
+                  setAktNumberDisabled(true);
+                  const res = await axios.get(getNextIncomingDocNum);
+                  setAktNumber(res.data.value);
+                } else {
+                  setAktNumber("");
+                  setAktNumberDisabled(false);
+                }
+              }}
+            />
+            <TextField
+              placeholder="AKT №"
+              label="AKT №"
+              type="number"
+              inputProps={{ inputMode: "numeric" }}
+              disabled={aktNumberDisabled}
+              value={aktNumber}
+              onChange={(e) => setAktNumber(e.target.value)}
+              style={{
+                width: "80%",
+              }}
+            />
+          </div>
 
-        <div style={{ display: "flex" }}>
-          <Button
-            variant="contained"
-            onClick={handleRefreshFromBilling}
-            disabled={refreshButtonDisabled}
-            style={{
-              height: "55px",
-              width: "50px",
-            }}
-          >
-            <CachedIcon />
-          </Button>
-          <TextField
-            placeholder="Лицавой"
-            type="number"
-            disabled={createAktButtonDisabled}
-            inputProps={{ inputMode: "numeric" }}
-            fullWidth
-            value={licshet}
-            onChange={(e) => setLicshet(e.target.value)}
-          />
-        </div>
-        <div className="file-input-container">
-          <input
-            type="file"
-            id="fileInput"
-            className="file-input"
-            disabled={true}
-          />
-          <label
-            htmlFor="fileInput"
-            className="custom-file-button"
-            style={{ width: "100%", textAlign: "center" }}
-          >
-            {currentPdf.name ? currentPdf.name : "Selected File"}
-          </label>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
-          <Switch
-            defaultChecked={true}
-            checked={!yashovchiInputDisable}
-            onChange={async (e) => {
-              if (e.target.checked) {
-                setYashovchiInputDisable(false);
-                set_prescribed_cnt(0);
-              } else {
-                set_prescribed_cnt("");
-                setYashovchiInputDisable(true);
-              }
-            }}
-          />
-          <TextField
-            placeholder="Yashovchi soni"
-            label="Yashovchi soni"
-            type="number"
-            inputProps={{ inputMode: "numeric" }}
-            disabled={yashovchiInputDisable}
-            value={prescribed_cnt}
-            onChange={(e) => set_prescribed_cnt(e.target.value)}
-            style={{
-              width: "80%",
-            }}
-          />
-        </div>
-        <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
-          <Switch
-            checked={!aktSummasiInputDisabled}
-            onChange={async (e) => {
-              if (e.target.checked) {
-                setAktSummasiInputDisabled(false);
-                setAmount(0);
-              } else {
-                setAmount("");
-                setAktSummasiInputDisabled(true);
-              }
-            }}
-          />
-          <TextField
-            placeholder="Akt summasi"
-            label="Akt summasi"
-            type="number"
-            disabled={aktSummasiInputDisabled}
-            inputProps={{ inputMode: "numeric" }}
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            style={{
-              width: "100%",
-            }}
-          />
-        </div>
-        <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
-          {/* <Switch
+          <div style={{ display: "flex" }}>
+            <Button
+              variant="contained"
+              onClick={() => handleRefreshFromBilling()}
+              disabled={refreshButtonDisabled}
+              style={{
+                height: "55px",
+                width: "50px",
+              }}
+            >
+              <CachedIcon />
+            </Button>
+            <TextField
+              placeholder="Лицавой"
+              type="number"
+              disabled={createAktButtonDisabled}
+              inputProps={{ inputMode: "numeric" }}
+              fullWidth
+              value={licshet}
+              onChange={(e) => setLicshet(e.target.value)}
+            />
+          </div>
+          <div className="file-input-container">
+            <input
+              type="file"
+              id="fileInput"
+              className="file-input"
+              disabled={true}
+            />
+            <label
+              htmlFor="fileInput"
+              className="custom-file-button"
+              style={{ width: "100%", textAlign: "center" }}
+            >
+              {currentPdf.name ? currentPdf.name : "Selected File"}
+            </label>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
+            <Switch
+              defaultChecked={true}
+              checked={!yashovchiInputDisable}
+              onChange={async (e) => {
+                if (e.target.checked) {
+                  setYashovchiInputDisable(false);
+                  set_prescribed_cnt(0);
+                } else {
+                  set_prescribed_cnt("");
+                  setYashovchiInputDisable(true);
+                }
+              }}
+            />
+            <TextField
+              placeholder="Yashovchi soni"
+              label="Yashovchi soni"
+              type="number"
+              inputProps={{ inputMode: "numeric" }}
+              disabled={yashovchiInputDisable}
+              value={prescribed_cnt}
+              onChange={(e) => set_prescribed_cnt(e.target.value)}
+              style={{
+                width: "80%",
+              }}
+            />
+          </div>
+          <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
+            <Switch
+              checked={!aktSummasiInputDisabled}
+              onChange={async (e) => {
+                if (e.target.checked) {
+                  setAktSummasiInputDisabled(false);
+                  setAmount(0);
+                } else {
+                  setAmount("");
+                  setAktSummasiInputDisabled(true);
+                }
+              }}
+            />
+            <TextField
+              placeholder="Akt summasi"
+              label="Akt summasi"
+              type="number"
+              disabled={aktSummasiInputDisabled}
+              inputProps={{ inputMode: "numeric" }}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              style={{
+                width: "100%",
+              }}
+            />
+          </div>
+          <div style={{ display: "flex", alignItems: "center", marginTop: 10 }}>
+            {/* <Switch
             checked={!ndsSummaInputDisabled}
             onChange={async (e) => {
               if (e.target.checked) {
@@ -480,95 +630,113 @@ export default function ImportArizalar() {
               }
             }}
           /> */}
-          <TextField
-            label="nds summasi"
-            type="number"
-            disabled={ndsSummaInputDisabled}
-            inputProps={{ inputMode: "numeric" }}
-            value={ndsSumma}
-            style={{
-              width: "100%",
+            <TextField
+              label="nds summasi"
+              type="number"
+              disabled={ndsSummaInputDisabled}
+              inputProps={{ inputMode: "numeric" }}
+              value={ndsSumma}
+              style={{
+                width: "100%",
+              }}
+            />
+          </div>
+          <TextareaAutosize
+            placeholder="Izoh"
+            disabled={createAktButtonDisabled}
+            onFocus={(event) => {
+              event.target.setSelectionRange(0, event.target.value.length);
             }}
-          />
-        </div>
-        <TextareaAutosize
-          placeholder="Izoh"
-          disabled={createAktButtonDisabled}
-          onFocus={(event) => {
-            event.target.setSelectionRange(0, event.target.value.length);
-          }}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-        ></TextareaAutosize>
-        <div style={{ display: "flex", margin: "5px 0" }}>
-          <Button
-            variant="contained"
-            color="error"
-            onClick={handleCancelButtonClick}
-            disabled={createAktButtonDisabled}
-          >
-            Bekor qilish
-          </Button>{" "}
-          <Button
-            variant="contained"
-            color="primary"
-            disabled={createAktButtonDisabled}
-            onClick={handleCreateAktButtonClick}
-          >
-            AKT qilish
-          </Button>
-        </div>
-        <div style={{ height: 530, width: 800 }}>
-          <DataTable rows={rows} />
-        </div>
-      </div>
-      <div>
-        <List>
-          <ListItem>FIO: {abonentData.fio}</ListItem>
-
-          <ListItem>ARIZA status: {arizaData.status}</ListItem>
-          <ListItem>KOD: {arizaData.licshet}</ListItem>
-          <ListItem>AKT summa: {arizaData.aktSummasi}</ListItem>
-        </List>
-        <div style={{ margin: "0 10px" }}>
-          <p>
-            <b>NDS hisoblash</b>
-          </p>
-          <div style={{ display: "flex" }}>
-            <TextField
-              label="dan"
-              type="number"
-              value={ndsInput1Value}
-              onChange={(e) => setNdsInput1Value(e.target.value)}
-              InputProps={{ inputProps: { min: 4, max: 8 } }}
-            />
-            <TextField
-              label="gacha"
-              type="number"
-              value={ndsInput2Value}
-              onChange={(e) => setNdsInput2Value(e.target.value)}
-              InputProps={{ inputProps: { min: 4, max: 8 } }}
-            />
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          ></TextareaAutosize>
+          <div style={{ display: "flex", margin: "5px 0" }}>
             <Button
               variant="contained"
-              color="success"
-              onClick={handleAddButtonClick}
+              color="error"
+              onClick={handleCancelButtonClick}
+              disabled={createAktButtonDisabled}
             >
-              Add
+              Bekor qilish
+            </Button>{" "}
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={createAktButtonDisabled}
+              onClick={handleCreateAktButtonClick}
+            >
+              AKT qilish
             </Button>
           </div>
-          <List>
-            {ndsItems.map((item, i) => (
-              <ListItem sx={{ height: 25 }}>
-                0{item.dan}-0{item.gacha}: {item.summ} so'm{" "}
-                <IconButton onClick={() => handleDeleteNds(i)}>
-                  <DeleteIcon />
-                </IconButton>
-              </ListItem>
-            ))}
-          </List>
+          <div style={{ height: 530, width: 800 }}>
+            <DataTable rows={rows} />
+          </div>
         </div>
-      </div>
+      ) : (
+        <InputPanel />
+      )}
+      {arizaData.document_type !== "dvaynik" ? (
+        <div>
+          <List>
+            <ListItem>FIO: {abonentData.fio}</ListItem>
+
+            <ListItem>ARIZA status: {arizaData.status}</ListItem>
+            <ListItem>KOD: {arizaData.licshet}</ListItem>
+            <ListItem>
+              AKT summa: {arizaData.aktSummasi}
+              {counterDiffMonth(new Date(arizaData.sana)) ? (
+                <span className="red">
+                  +{" "}
+                  {(arizaData.current_prescribed_cnt -
+                    arizaData.next_prescribed_cnt) *
+                    4625 *
+                    counterDiffMonth(new Date(arizaData.sana))}
+                </span>
+              ) : null}
+            </ListItem>
+          </List>
+          <div style={{ margin: "0 10px" }}>
+            <p>
+              <b>NDS hisoblash</b>
+            </p>
+            <div style={{ display: "flex" }}>
+              <TextField
+                label="dan"
+                type="number"
+                value={ndsInput1Value}
+                onChange={(e) => setNdsInput1Value(e.target.value)}
+                InputProps={{ inputProps: { min: 4, max: 8 } }}
+              />
+              <TextField
+                label="gacha"
+                type="number"
+                value={ndsInput2Value}
+                onChange={(e) => setNdsInput2Value(e.target.value)}
+                InputProps={{ inputProps: { min: 4, max: 8 } }}
+              />
+              <Button
+                variant="contained"
+                color="success"
+                onClick={handleAddButtonClick}
+              >
+                Add
+              </Button>
+            </div>
+            <List>
+              {ndsItems.map((item, i) => (
+                <ListItem sx={{ height: 25 }}>
+                  0{item.dan}-0{item.gacha}: {item.summ} so'm{" "}
+                  <IconButton onClick={() => handleDeleteNds(i)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </ListItem>
+              ))}
+            </List>
+          </div>
+        </div>
+      ) : (
+        <MiddlePanel />
+      )}
       <Dialog
         open={showModal}
         aria-labelledby="dialog-title"
