@@ -122,7 +122,8 @@ export default function ImportArizalar() {
             const response = res.data;
             if (!response.ok) {
               setIsLoading(false);
-              return toast.error(response.message);
+              setArizaNumberDisabled(false);
+              return toast.error(response.result);
             }
             if (response.result.split("_")[0] !== "ariza") {
               setIsLoading(false);
@@ -183,19 +184,25 @@ export default function ImportArizalar() {
           set_prescribed_cnt(ariza.next_prescribed_cnt);
           setYashovchiInputDisable(false);
         } else setYashovchiInputDisable(true);
+
         setAmount(
           ariza.aktSummasi +
-            (ariza.current_prescribed_cnt - ariza.next_prescribed_cnt) *
+            (ariza.next_prescribed_cnt - ariza.current_prescribed_cnt) *
               4625 *
               diffMonth
         );
-        if (
+        console.log(
+          ariza.aktSummasi,
+          ariza.next_prescribed_cnt,
+          ariza.current_prescribed_cnt,
+          diffMonth
+        );
+        let b =
           ariza.aktSummasi +
-            (ariza.current_prescribed_cnt - ariza.next_prescribed_cnt) *
-              4625 *
-              diffMonth >
-          0
-        ) {
+          (ariza.next_prescribed_cnt - ariza.current_prescribed_cnt) *
+            4625 *
+            diffMonth;
+        if (b != 0) {
           setAktSummasiInputDisabled(false);
         } else setAktSummasiInputDisabled(true);
         setLicshet(ariza.licshet);
@@ -212,19 +219,18 @@ export default function ImportArizalar() {
         } else setYashovchiInputDisable(true);
         setAmount(
           ariza.aktSummasi +
-            (ariza.current_prescribed_cnt - ariza.next_prescribed_cnt) *
+            (ariza.next_prescribed_cnt - ariza.current_prescribed_cnt) *
               4625 *
               diffMonth
         );
-        if (
+        let a =
           ariza.aktSummasi +
-            (ariza.current_prescribed_cnt - ariza.next_prescribed_cnt) *
-              4625 *
-              diffMonth >
-          0
-        ) {
-          setAktSummasiInputDisabled(false);
-        } else setAktSummasiInputDisabled(true);
+          (ariza.next_prescribed_cnt - ariza.current_prescribed_cnt) *
+            4625 *
+            diffMonth;
+        if (a == 0) {
+          setAktSummasiInputDisabled(true);
+        } else setAktSummasiInputDisabled(false);
         setLicshet(ariza.licshet);
         setArizaNumberDisabled(true);
         setArizaNumber(ariza.document_number);
@@ -690,8 +696,8 @@ export default function ImportArizalar() {
               {counterDiffMonth(new Date(arizaData.sana)) ? (
                 <span className="red">
                   +{" "}
-                  {(arizaData.current_prescribed_cnt -
-                    arizaData.next_prescribed_cnt) *
+                  {(arizaData.next_prescribed_cnt -
+                    arizaData.current_prescribed_cnt) *
                     4625 *
                     counterDiffMonth(new Date(arizaData.sana))}
                 </span>
