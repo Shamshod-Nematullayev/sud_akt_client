@@ -1,4 +1,4 @@
-module.exports.host = `http://192.168.1.121:5000`;
+module.exports.host = `http://localhost:5000`;
 module.exports.loginAPI = `${this.host}/api/auth/login`;
 module.exports.sudAkts = `${this.host}/api/sudAkts`;
 module.exports.bildirgilar = `${this.host}/api/bildirgilar`;
