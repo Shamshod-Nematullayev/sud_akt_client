@@ -1,4 +1,4 @@
-module.exports.host = `http://localhost:5000`;
+module.exports.host = `http://192.168.1.138:5000`;
 module.exports.loginAPI = `${this.host}/api/auth/login`;
 module.exports.sudAkts = `${this.host}/api/sudAkts`;
 module.exports.bildirgilar = `${this.host}/api/bildirgilar`;
@@ -9,4 +9,10 @@ module.exports.pachkalar = `${this.host}/api/pachkalar/`;
 module.exports.documents = `${this.host}/api/documents/`;
 module.exports.getNextIncomingDocNum = `${this.host}/api/billing/next-incoming-document-number/`;
 module.exports.createFullAkt = `${this.host}/api/billing/create-full-akt/`;
+module.exports.createDvaynikAkt = `${this.host}/api/billing/create-dvaynik-akt/`;
 module.exports.getDXJ = `${this.host}/api/billing/get-abonent-dxj-by-licshet/`;
+module.exports.get_abonent_data_by_licshet = `${this.host}/api/billing/get-abonent-data-by-licshet/`; // params: licshet
+module.exports.scan_ariza_qr = `${this.host}/api/arizalar/scan_ariza_qr/`;
+module.exports.get_ariza_by_id = `${this.host}/api/arizalar/get-ariza-by-id/`; // params: _id
+module.exports.get_ariza_by_document_number = `${this.host}/api/arizalar/get-ariza-by-document-number/`; // params: document_number
+module.exports.cancel_ariza_by_id = `${this.host}/api/arizalar/cancel-ariza-by-id/`; // body: _id, canceling_description

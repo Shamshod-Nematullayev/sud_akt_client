@@ -6,94 +6,25 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import CachedIcon from "@mui/icons-material/Cached";
 
 import React, { useEffect } from "react";
 import { useState } from "react";
 import SideBar from "../SideBar";
+import CachedIcon from "@mui/icons-material/Cached";
 import DeleteIcon from "@mui/icons-material/Delete";
 import "./style.css";
 import axios from "axios";
 import { getNextIncomingDocNum, createFullAkt } from "../../utils/APIRouters";
 import { toast } from "react-toastify";
 import DataTable from "./DataTable";
+import InputCalculator from "./InputCalculator";
+import { hisoblandiJadval } from "../../utils/constants";
 const APIs = require("../../utils/APIRouters");
 
 export default function Calculator() {
-  const hisoblandiJadval = [
-    { month: 1, year: 2019, hisoblandi: 2000 },
-    { month: 2, year: 2019, hisoblandi: 2500 },
-    { month: 3, year: 2019, hisoblandi: 2500 },
-    { month: 4, year: 2019, hisoblandi: 2500 },
-    { month: 5, year: 2019, hisoblandi: 2500 },
-    { month: 6, year: 2019, hisoblandi: 2500 },
-    { month: 7, year: 2019, hisoblandi: 2500 },
-    { month: 8, year: 2019, hisoblandi: 2500 },
-    { month: 9, year: 2019, hisoblandi: 2500 },
-    { month: 10, year: 2019, hisoblandi: 2500 },
-    { month: 11, year: 2019, hisoblandi: 2500 },
-    { month: 12, year: 2019, hisoblandi: 2500 },
-    { month: 1, year: 2020, hisoblandi: 2500 },
-    { month: 2, year: 2020, hisoblandi: 2500 },
-    { month: 3, year: 2020, hisoblandi: 2500 },
-    { month: 4, year: 2020, hisoblandi: 2500 },
-    { month: 5, year: 2020, hisoblandi: 2500 },
-    { month: 6, year: 2020, hisoblandi: 2500 },
-    { month: 7, year: 2020, hisoblandi: 2500 },
-    { month: 8, year: 2020, hisoblandi: 2500 },
-    { month: 9, year: 2020, hisoblandi: 2500 },
-    { month: 10, year: 2020, hisoblandi: 2500 },
-    { month: 11, year: 2020, hisoblandi: 2500 },
-    { month: 12, year: 2020, hisoblandi: 2500 },
-    { month: 1, year: 2021, hisoblandi: 2500 },
-    { month: 2, year: 2021, hisoblandi: 2500 },
-    { month: 3, year: 2021, hisoblandi: 2500 },
-    { month: 4, year: 2021, hisoblandi: 2500 },
-    { month: 5, year: 2021, hisoblandi: 2500 },
-    { month: 6, year: 2021, hisoblandi: 2500 },
-    { month: 7, year: 2021, hisoblandi: 2500 },
-    { month: 8, year: 2021, hisoblandi: 2500 },
-    { month: 9, year: 2021, hisoblandi: 2500 },
-    { month: 10, year: 2021, hisoblandi: 2500 },
-    { month: 11, year: 2021, hisoblandi: 2500 },
-    { month: 12, year: 2021, hisoblandi: 2900 },
-    { month: 1, year: 2022, hisoblandi: 2900 },
-    { month: 2, year: 2022, hisoblandi: 2900 },
-    { month: 3, year: 2022, hisoblandi: 2900 },
-    { month: 4, year: 2022, hisoblandi: 2900 },
-    { month: 5, year: 2022, hisoblandi: 2900 },
-    { month: 6, year: 2022, hisoblandi: 2900 },
-    { month: 7, year: 2022, hisoblandi: 2900 },
-    { month: 8, year: 2022, hisoblandi: 2900 },
-    { month: 9, year: 2022, hisoblandi: 2900 },
-    { month: 10, year: 2022, hisoblandi: 2900 },
-    { month: 11, year: 2022, hisoblandi: 2900 },
-    { month: 12, year: 2022, hisoblandi: 2900 },
-    { month: 1, year: 2023, hisoblandi: 2900 },
-    { month: 2, year: 2023, hisoblandi: 2900 },
-    { month: 3, year: 2023, hisoblandi: 2900 },
-    { month: 4, year: 2023, hisoblandi: 2900 },
-    { month: 5, year: 2023, hisoblandi: 2900 },
-    { month: 6, year: 2023, hisoblandi: 2900 },
-    { month: 7, year: 2023, hisoblandi: 2900 },
-    { month: 8, year: 2023, hisoblandi: 2900 },
-    { month: 9, year: 2023, hisoblandi: 2900 },
-    { month: 10, year: 2023, hisoblandi: 2900 },
-    { month: 11, year: 2023, hisoblandi: 2900 },
-    { month: 12, year: 2023, hisoblandi: 4129 },
-    { month: 1, year: 2024, hisoblandi: 4129 },
-    { month: 2, year: 2024, hisoblandi: 4129 },
-    { month: 3, year: 2024, hisoblandi: 4129 },
-    { month: 4, year: 2024, hisoblandi: 4625 },
-    { month: 5, year: 2024, hisoblandi: 4625 },
-    { month: 6, year: 2024, hisoblandi: 4625 },
-    { month: 7, year: 2024, hisoblandi: 4625 },
-    { month: 8, year: 2024, hisoblandi: 4625 },
-    { month: 9, year: 2024, hisoblandi: 4625 },
-    { month: 10, year: 2024, hisoblandi: 4625 },
-    { month: 11, year: 2024, hisoblandi: 4625 },
-  ];
   const [currentTotal, setCurrentTotal] = useState(0);
+  const [currentNds, setCurrentNds] = useState(0);
+  const [ndsTotal, setNdsTotal] = useState(0);
   const [fromMoon, setFromMoon] = useState(1);
   const [fromYear, setFromYear] = useState(2019);
   const [toMoon, setToMoon] = useState(2);
@@ -121,12 +52,14 @@ export default function Calculator() {
       {
         name: `${fromMoon}.${fromYear}-${toMoon}.${toYear}`,
         summ: currentTotal,
+        nds: currentNds,
       },
     ]);
   };
 
   const qaytaHisob = ({ fromMoon, fromYear, toMoon, toYear, yashovchilar }) => {
     let summ = 0;
+    let nds = 0;
     for (let i = 0; i < hisoblandiJadval.length; i++) {
       const davr = hisoblandiJadval[i];
 
@@ -138,18 +71,25 @@ export default function Calculator() {
           davr.year < toYear ||
           (davr.year == toYear && davr.month <= toMoon)
         ) {
+          if (davr.nds) {
+            nds += davr.nds * yashovchilar;
+          }
           summ += davr.hisoblandi * yashovchilar;
         }
       }
     }
+    setCurrentNds(nds);
     setCurrentTotal(summ);
   };
   useEffect(() => {
     let total = 0;
+    let nds = 0;
     countes.forEach((count) => {
       total += count.summ;
+      nds += count.nds;
     });
     setTotal(total);
+    setNdsTotal(nds);
   }, [countes]);
 
   const handleRefreshFromBilling = async () => {
@@ -522,6 +462,7 @@ export default function Calculator() {
                       yashovchilarUzgartirish: !yashovchiInputDisable,
                       qaytaHisobBuladi: !aktSummasiInputDisabled,
                       amount,
+                      nds_summ: ndsTotal,
                     },
                     {
                       headers: {
@@ -537,6 +478,7 @@ export default function Calculator() {
                   // setFileInputLabel("Choose file");
                   const res2 = await axios.get(getNextIncomingDocNum);
                   setAktNumber(res2.data.value);
+                  setCountes([]);
                   setCreateAktButtonDisabled(false);
                 }}
               >
@@ -547,8 +489,22 @@ export default function Calculator() {
               <div>MFY: {abonentData.mahalla_name}</div>
               <div>FIO: {abonentData.fio}</div>
             </div>
-            <div style={{ margin: "40px 60px" }}>
+            <div style={{ margin: "40px 60px", height: 550 }}>
               <DataTable rows={rows} />
+            </div>
+            <div
+              style={{
+                height: 600,
+                flexDirection: "column",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+              }}
+            >
+              <div>
+                <InputCalculator />
+                <InputCalculator />
+              </div>
             </div>
           </div>
 
@@ -560,7 +516,7 @@ export default function Calculator() {
               fontSize: 32,
             }}
           >
-            TOTAL: <b>{total}</b>
+            TOTAL: <b>{total}</b> NDS: {ndsTotal}
           </Typography>
         </Paper>
       </div>

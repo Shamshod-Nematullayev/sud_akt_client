@@ -51,12 +51,9 @@ export default function DataTable({ rows }) {
     <StripedDataGrid
       columns={columns}
       rows={rows}
-      style={{ width: 770, height: 600 }}
       getRowClassName={(params) =>
         params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
       }
-    >
-      DataTable
-    </StripedDataGrid>
+    />
   );
 }

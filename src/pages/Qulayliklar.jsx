@@ -1,10 +1,12 @@
-import { Button, Modal } from "@mui/material";
+import { Button, Paper } from "@mui/material";
 import React from "react";
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import SideBar from "../components/SideBar";
+import arizalarArxivFileStore from "../store/arizalarArxivFileStore";
 
 export default function Qulayliklar() {
+  const arizalarArxivFile = arizalarArxivFileStore();
+  console.log(arizalarArxivFile.file);
   return (
     <div className="admin-page">
       {/* Yuklanmoqda loader */}
@@ -12,14 +14,16 @@ export default function Qulayliklar() {
 
       <div className="container">
         <div className="buttonsPanel">
-          <Button
-            color="error"
-            variant="contained"
-            data-bs-toggle=""
-            data-bs-target=""
-          >
-            Ikkilamchilarni o'chirish
-          </Button>
+          <Link to="/dvayniklarUchirish">
+            <Button
+              color="error"
+              variant="contained"
+              data-bs-toggle=""
+              data-bs-target=""
+            >
+              Ikkilamchilarni o'chirish
+            </Button>
+          </Link>
           <Link to="/calculator">
             <Button color="secondary" variant="contained">
               Kalkulyator
@@ -38,6 +42,11 @@ export default function Qulayliklar() {
           <Link to="/abarotkaChiqorish">
             <Button color="secondary" variant="contained">
               Abarotka chiqarish
+            </Button>
+          </Link>
+          <Link to="/arizalarImport">
+            <Button color="secondary" variant="contained">
+              Arizalar import
             </Button>
           </Link>
         </div>
