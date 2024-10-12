@@ -22,37 +22,47 @@ export default function ImportArizalarPage() {
   const { isLoading } = useLoaderStore();
   const [showModal, setShowModal] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
-  const { file, setData, currentPdf, setPdfFiles, setZipFiles } =
-    arizalarArxivFileStore();
+  const { file, setData, currentPdf, setPdfFiles } = arizalarArxivFileStore();
+
+  const extractPdfFilesFromZip = async (zip) => {
+    const filesPromises = Object.values(zip.files)
+      .filter((file) => file.name.toLowerCase().endsWith(".pdf"))
+      .map(async (file) => {
+        const arrayBuffer = await file.async("arraybuffer");
+        const pdfBlob = new Blob([arrayBuffer], { type: "application/pdf" });
+        const url = URL.createObjectURL(pdfBlob);
+        return { pdfBlob, name: file.name, url };
+      });
+
+    return await Promise.all(filesPromises);
+  };
+  const processPdfFile = async (file) => {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdfBlob = new Blob([arrayBuffer], { type: "application/pdf" });
+    const url = URL.createObjectURL(pdfBlob);
+    return { pdfBlob, name: file.name, url };
+  };
 
   // handle functions
   const handleSubmit = async (event) => {
-    if (!selectedFile) return toast.error(`file not selected`);
+    event.preventDefault(); // Agar formdan foydalanayotgan bo'lsangiz, bu qo'shilsin
 
-    // setShowBackdrop(true);
-    setShowModal(false);
-    setData(selectedFile);
-    const zip = await JSZip.loadAsync(selectedFile);
-    setZipFiles(zip.files);
-    const filesPromises = [];
-
-    for (const property in zip.files) {
-      const file = zip.files[property];
-      if (file.name.toLowerCase().endsWith(".pdf")) {
-        filesPromises.push(
-          file.async("arraybuffer").then((arrayBuffer) => {
-            const pdfBlob = new Blob([arrayBuffer], {
-              type: "application/pdf",
-            });
-            const url = URL.createObjectURL(pdfBlob);
-            return { name: file.name, url };
-          })
-        );
-      }
+    if (!selectedFile) {
+      return toast.error("File not selected");
     }
 
-    const files = await Promise.all(filesPromises);
-    setPdfFiles(files);
+    if (selectedFile.type === "application/pdf") {
+      setShowModal(false);
+      setData(selectedFile);
+      const pdfFile = await processPdfFile(selectedFile);
+      setPdfFiles([pdfFile]);
+      return;
+    }
+    const zip = await JSZip.loadAsync(selectedFile);
+    setShowModal(false);
+    setData(selectedFile);
+    const pdfFiles = await extractPdfFilesFromZip(zip);
+    setPdfFiles(pdfFiles);
   };
 
   return (
@@ -67,8 +77,8 @@ export default function ImportArizalarPage() {
         <DialogContent>
           <DialogContentText id="dialog-description">
             Bu yerga Xadsen tizimiga ro'yxatdan o'tkazilgan arizalarning PDF
-            filelaridan iborat bo'lgan RAR arxiv fayli yuklanishi kerak{" "}
-            {file ? file.name : ""}
+            filelaridan iborat bo'lgan ZIP arxiv fayli yoki 1 dona PDF fayli
+            yuklanishi kerak {file ? file.name : ""}
           </DialogContentText>
           <MainFileInput
             selectedFile={selectedFile}

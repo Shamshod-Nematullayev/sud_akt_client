@@ -40,7 +40,9 @@ const MainFileInput = ({ selectedFile, setSelectedFile }) => {
     const file =
       event.dataTransfer.items[0]?.getAsFile() || event.dataTransfer.files[0];
     if (file) {
-      setIsValidFile(file.name.endsWith(".zip"));
+      setIsValidFile(
+        file.name.endsWith(".zip") || file.name.toLowerCase().endsWith(".pdf")
+      );
     }
     setIsDragging(true);
   };
@@ -54,7 +56,10 @@ const MainFileInput = ({ selectedFile, setSelectedFile }) => {
     setIsDragging(false);
     const file = event.dataTransfer.files[0];
     if (file) {
-      if (file.name.endsWith(".zip")) {
+      if (
+        file.name.endsWith(".zip") ||
+        file.name.toLowerCase().endsWith(".pdf")
+      ) {
         setSelectedFile(file);
         setIsValidFile(true);
       } else {
@@ -73,7 +78,7 @@ const MainFileInput = ({ selectedFile, setSelectedFile }) => {
       <FileInput
         type="file"
         id="file-upload"
-        accept=".zip"
+        accept=".zip,.pdf"
         onChange={handleFileSelect}
       />
       <label htmlFor="file-upload" style={{ width: "100%" }}>

@@ -13,8 +13,7 @@ export default function InputPanel({
 }) {
   const { setIsLoading } = useLoaderStore();
   const { abonent1Data, abonent2Data } = useDvayniklarStore();
-  const { currentPdf, zipFiles, deleteOneFile, arizaData } =
-    arizalarArxivFileStore();
+  const { currentPdf, deleteOneFile, arizaData } = arizalarArxivFileStore();
   const [aktNumberDisabled, setAktNumberDisabled] = useState(false);
   const [aktNumber, setAktNumber] = useState(0);
 
@@ -28,7 +27,7 @@ export default function InputPanel({
         Dvaynik_kod: abonent2Data.licshet,
       },
     ];
-    const fileBlob = await parseToPdfBlob(zipFiles[currentPdf.name]);
+    const fileBlob = (await parseToPdfBlob(currentPdf)).pdfBlob;
     if (!fileBlob) return;
     if (aktNumberDisabled) {
       const respons = await axios.post(
@@ -80,17 +79,11 @@ export default function InputPanel({
     return true;
   };
   const parseToPdfBlob = async (data) => {
-    console.log();
     if (data._data.uncompressedSize / (1024 * 1024) > 10) {
       toast.error(`Fayl 10Mb-dan ko'p bo'lishi mumkin emas.`);
       return false;
     }
-    return data.async("arraybuffer").then(async (arrayBuffer) => {
-      const pdfBlob = new Blob([arrayBuffer], {
-        type: "application/pdf",
-      });
-      return pdfBlob;
-    });
+    return data;
   };
   return (
     <div

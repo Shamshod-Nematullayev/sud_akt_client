@@ -70,7 +70,7 @@ export default function ImportArizalar() {
 
   const {
     currentPdf,
-    zipFiles,
+    pdfFiles,
     arizaData,
     setArizaData,
     deleteOneFile,
@@ -102,53 +102,45 @@ export default function ImportArizalar() {
     async function fetchData() {
       if (!isEmpty(currentPdf)) {
         setIsLoading(true);
-        zipFiles[currentPdf.name]
-          .async("arraybuffer")
-          .then(async (arrayBuffer) => {
-            const pdfBlob = new Blob([arrayBuffer], {
-              type: "application/pdf",
-            });
-            const res = await axios.post(
-              APIs.scan_ariza_qr,
-              {
-                file: pdfBlob,
-              },
-              {
-                headers: {
-                  "Content-Type": "multipart/form-data",
-                },
-              }
-            );
-            const response = res.data;
-            if (!response.ok) {
-              setIsLoading(false);
-              setArizaNumberDisabled(false);
-              return toast.error(response.result);
-            }
-            if (response.result.split("_")[0] !== "ariza") {
-              setIsLoading(false);
-              setArizaNumberDisabled(false);
-              return toast.error("Noma'lum QR kod");
-            }
-            let ariza = (
-              await axios.get(
-                APIs.get_ariza_by_id + response.result.split("_")[1]
-              )
-            ).data;
-            if (!ariza.ok) {
-              setIsLoading(false);
-              return toast.error(ariza.message);
-            }
-            ariza = ariza.ariza;
-            if (ariza.document_number != response.result.split("_")[2]) {
-              setIsLoading(false);
-              return toast.error(
-                "QR koddagi va bazadagi ariza raqamlari o'zaro mos emas"
-              );
-            }
-            setIsLoading(false);
-            await setArizaDataHandler(ariza);
-          });
+
+        const res = await axios.post(
+          APIs.scan_ariza_qr,
+          {
+            file: currentPdf.pdfBlob,
+          },
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        const response = res.data;
+        if (!response.ok) {
+          setIsLoading(false);
+          setArizaNumberDisabled(false);
+          return toast.error(response.result);
+        }
+        if (response.result.split("_")[0] !== "ariza") {
+          setIsLoading(false);
+          setArizaNumberDisabled(false);
+          return toast.error("Noma'lum QR kod");
+        }
+        let ariza = (
+          await axios.get(APIs.get_ariza_by_id + response.result.split("_")[1])
+        ).data;
+        if (!ariza.ok) {
+          setIsLoading(false);
+          return toast.error(ariza.message);
+        }
+        ariza = ariza.ariza;
+        if (ariza.document_number != response.result.split("_")[2]) {
+          setIsLoading(false);
+          return toast.error(
+            "QR koddagi va bazadagi ariza raqamlari o'zaro mos emas"
+          );
+        }
+        setIsLoading(false);
+        await setArizaDataHandler(ariza);
       }
     }
     fetchData();
@@ -323,24 +315,18 @@ export default function ImportArizalar() {
   };
 
   const parseToPdfBlob = async (data) => {
-    console.log();
     if (data._data.uncompressedSize / (1024 * 1024) > 10) {
       toast.error(`Fayl 10Mb-dan ko'p bo'lishi mumkin emas.`);
       return false;
     }
-    return data.async("arraybuffer").then(async (arrayBuffer) => {
-      const pdfBlob = new Blob([arrayBuffer], {
-        type: "application/pdf",
-      });
-      return pdfBlob;
-    });
+    return currentPdf;
   };
 
   const handleCreateAktButtonClick = async (e) => {
-    if (!zipFiles[currentPdf.name]) {
+    if (!currentPdf.name) {
       return toast.error(`Fayl tanlanmagan`);
     }
-    const fileBlob = await parseToPdfBlob(zipFiles[currentPdf.name]);
+    const fileBlob = await parseToPdfBlob(currentPdf);
     if (!fileBlob) return;
     setCreateAktButtonDisabled(true);
     const result = await axios.post(

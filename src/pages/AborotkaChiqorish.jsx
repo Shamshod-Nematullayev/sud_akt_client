@@ -255,7 +255,15 @@ export default function AbarotkaChiqorish() {
                   {abonent.last_pay_amount}
                 </td>
                 <td>{abonent.last_pay_date?.split(" ")[0]}</td>
-                <td>{abonent.energy_licshet}</td>
+                <td
+                  style={{
+                    textDecoration: abonent.isElektrKodConfirm
+                      ? "line-through"
+                      : "none",
+                  }}
+                >
+                  {abonent.energy_licshet}
+                </td>
               </tr>
             ))}
           </table>

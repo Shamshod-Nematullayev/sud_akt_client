@@ -4,16 +4,9 @@ import arizalarArxivFileStore from "../../store/arizalarArxivFileStore";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 export default function SelectionListFiles() {
-  const {
-    pdfFiles,
-    setCurrentPdf,
-    deleteOneFile,
-    zipFiles,
-    setArizaData,
-    setNdsItems,
-  } = arizalarArxivFileStore();
+  const { pdfFiles, setCurrentPdf, deleteOneFile, setArizaData, setNdsItems } =
+    arizalarArxivFileStore();
   const [selectedNav, setSelectedNav] = useState(null);
-  console.log(zipFiles);
 
   // event handlers
   const handleSelectNav = (url) => {

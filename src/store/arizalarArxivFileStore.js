@@ -7,20 +7,10 @@ const arizalarArxivFileStore = create((set) => ({
   setPdfFiles: (pdfFilesData) => set({ pdfFiles: pdfFilesData }),
   currentPdf: {},
   setCurrentPdf: (pdfData) => set({ currentPdf: pdfData }),
-  zipFiles: [],
-  setZipFiles: (zipFilesData) => set({ zipFiles: zipFilesData }),
   deleteOneFile: (deletingFileName) =>
-    set((state) => {
-      const { [deletingFileName]: removedFile, ...remainingZipFiles } =
-        state.zipFiles;
-
-      return {
-        pdfFiles: state.pdfFiles.filter(
-          (file) => file.name !== deletingFileName
-        ),
-        zipFiles: remainingZipFiles,
-      };
-    }),
+    set((state) => ({
+      pdfFiles: state.pdfFiles.filter((file) => file.name !== deletingFileName),
+    })),
   arizaData: {},
   setArizaData: (data) => set({ arizaData: data }),
   ndsSumma: 0,
