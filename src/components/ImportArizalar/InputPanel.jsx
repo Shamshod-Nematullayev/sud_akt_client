@@ -79,7 +79,7 @@ export default function InputPanel({
     return true;
   };
   const parseToPdfBlob = async (data) => {
-    if (data._data.uncompressedSize / (1024 * 1024) > 10) {
+    if (data.pdfBlob.size / (1024 * 1024) > 10) {
       toast.error(`Fayl 10Mb-dan ko'p bo'lishi mumkin emas.`);
       return false;
     }
@@ -100,6 +100,7 @@ export default function InputPanel({
         value={abonent1Data.licshet}
         style={{ margin: "10px 0" }}
         fullWidth
+        InputLabelProps={{ shrink: true }}
         disabled
       />
       <TextField
@@ -108,6 +109,7 @@ export default function InputPanel({
         value={abonent2Data.licshet}
         style={{ margin: "10px 0" }}
         fullWidth
+        InputLabelProps={{ shrink: true }}
         disabled
       />
 
@@ -170,6 +172,7 @@ export default function InputPanel({
         onClick={handleCreateAktButtonClick}
         variant="contained"
         color="primary"
+        disabled={createAktButtonDisabled}
         fullWidth
       >
         Akt qilish

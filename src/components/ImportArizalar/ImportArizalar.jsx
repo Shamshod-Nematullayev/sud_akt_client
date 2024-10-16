@@ -102,6 +102,8 @@ export default function ImportArizalar() {
     async function fetchData() {
       if (!isEmpty(currentPdf)) {
         setIsLoading(true);
+        const formData = new FormData();
+        formData.append("file", currentPdf.pdfBlob, currentPdf.name);
 
         const res = await axios.post(
           APIs.scan_ariza_qr,
@@ -177,6 +179,7 @@ export default function ImportArizalar() {
           setYashovchiInputDisable(false);
         } else setYashovchiInputDisable(true);
 
+        if (isNaN(ariza.aktSummasi)) ariza.aktSummasi = 0;
         setAmount(
           ariza.aktSummasi +
             (ariza.next_prescribed_cnt - ariza.current_prescribed_cnt) *
@@ -315,7 +318,7 @@ export default function ImportArizalar() {
   };
 
   const parseToPdfBlob = async (data) => {
-    if (data._data.uncompressedSize / (1024 * 1024) > 10) {
+    if (data.pdfBlob.size / (1024 * 1024) > 10) {
       toast.error(`Fayl 10Mb-dan ko'p bo'lishi mumkin emas.`);
       return false;
     }
@@ -326,7 +329,7 @@ export default function ImportArizalar() {
     if (!currentPdf.name) {
       return toast.error(`Fayl tanlanmagan`);
     }
-    const fileBlob = await parseToPdfBlob(currentPdf);
+    const fileBlob = (await parseToPdfBlob(currentPdf)).pdfBlob;
     if (!fileBlob) return;
     setCreateAktButtonDisabled(true);
     const result = await axios.post(

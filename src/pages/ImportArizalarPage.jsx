@@ -22,7 +22,8 @@ export default function ImportArizalarPage() {
   const { isLoading } = useLoaderStore();
   const [showModal, setShowModal] = useState(true);
   const [selectedFile, setSelectedFile] = useState(null);
-  const { file, setData, currentPdf, setPdfFiles } = arizalarArxivFileStore();
+  const { file, setData, currentPdf, pdfFiles, setPdfFiles } =
+    arizalarArxivFileStore();
 
   const extractPdfFilesFromZip = async (zip) => {
     const filesPromises = Object.values(zip.files)
@@ -69,7 +70,7 @@ export default function ImportArizalarPage() {
     <div className="admin-page">
       {/* Arxivlangan faylni yuklab olish uchun modal oyna */}
       <Dialog
-        open={showModal}
+        open={pdfFiles.length > 0 ? false : true}
         aria-labelledby="dialog-title"
         aria-describedby="dialog-description"
       >
@@ -86,13 +87,6 @@ export default function ImportArizalarPage() {
           />
         </DialogContent>
         <DialogActions>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => setShowModal(false)}
-          >
-            Bekor qilish
-          </Button>
           <Link to="/qulayliklar">
             <Button variant="outlined" color="error">
               Chiqish

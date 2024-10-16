@@ -161,6 +161,7 @@ const CreateDalolatnoma = () => {
           toast.error("Xatolik yuz berdi, iltimos qayta urinib ko'ring");
           setPrintButtonDisabled(false);
         }
+        break;
 
       default:
         toast.error("Noma'lum xujjat turi tanlangan");
