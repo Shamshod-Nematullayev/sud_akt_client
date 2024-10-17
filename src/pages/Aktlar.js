@@ -8,8 +8,6 @@ import ImportAktModal from "../components/Aktlar/ImportAktModal";
 import CreateAktModal from "../components/Aktlar/CreateAktModal";
 import DeleteAlertModal from "../components/Aktlar/DeleteAlertModal";
 import Tools from "../components/Aktlar/Tools";
-import { hide } from "../app/reducers/showHideSlice";
-import { useDispatch } from "react-redux";
 import { Backdrop, CircularProgress } from "@mui/material";
 import { useParams } from "react-router-dom";
 
@@ -21,8 +19,6 @@ function Aktlar() {
   const [checked, setChecked] = useState([]);
   const [showBackdrop, setShowBackrop] = useState(true);
 
-  const dispatch = useDispatch();
-
   const columns = [
     { field: "id", headerName: "№", width: 50 },
     { field: "kod", headerName: "Litsavoy", width: 150 },
@@ -32,7 +28,7 @@ function Aktlar() {
       headerName: "Bildirgi",
       width: 70,
       renderCell: (params) => {
-        return params.row.bildirish_xati.raqami ? (
+        return params.row.bildirish_xati?.raqami ? (
           <a href={params.row.bildirish_xati.link}>
             {params.row.bildirish_xati.raqami}
           </a>
@@ -58,7 +54,7 @@ function Aktlar() {
       headerName: "Forma 1",
       width: 150,
       renderCell: (params) => {
-        return params.row.forma1.topildi ? (
+        return params.row.forma1?.topildi ? (
           <span className="text-success text-bold">Aniqlandi</span>
         ) : (
           <span className="text-danger">Yo'q</span>
@@ -119,7 +115,7 @@ function Aktlar() {
       }
     }
     fetchData();
-    dispatch(hide());
+    // bu yerda modal oynani yashiradigan kod bo'lishi kerak
   };
 
   const fetchSudBuyrugiChiqorilgan = async () => {

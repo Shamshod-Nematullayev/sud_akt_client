@@ -6,17 +6,13 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@mui/material";
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { hide } from "../../app/reducers/showHideSlice";
+import React, { useState } from "react";
 
 function DeleteAlertModal({ fetchDelete }) {
-  const { show } = useSelector((state) => state.showHide);
-  const dispatch = useDispatch();
-  console.log(show);
+  const [show, setShow] = useState(false);
 
   const handleClose = () => {
-    dispatch(hide());
+    setShow(false);
   };
 
   return (

@@ -4,8 +4,6 @@ import "./index.css";
 import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider, createTheme } from "@mui/material";
 import { ToastContainer } from "react-toastify";
-import { Provider } from "react-redux";
-import { store } from "./app/store";
 import AppRoutes from "./components/Routers";
 
 class ErrorBoundary extends Component {
@@ -36,17 +34,16 @@ function App() {
   const darkTheme = createTheme({
     palette: { mode: "light" },
   });
+  document.querySelector("html").setAttribute("data-bs-theme", "light");
   return (
-    <Provider store={store}>
-      <BrowserRouter className="App">
-        <ThemeProvider theme={darkTheme}>
-          <ErrorBoundary>
-            <AppRoutes />
-          </ErrorBoundary>
-          <ToastContainer autoClose="3000" theme="light" position="top-right" />
-        </ThemeProvider>
-      </BrowserRouter>
-    </Provider>
+    <BrowserRouter className="App">
+      <ThemeProvider theme={darkTheme}>
+        <ErrorBoundary>
+          <AppRoutes />
+        </ErrorBoundary>
+        <ToastContainer autoClose="3000" theme="light" position="top-right" />
+      </ThemeProvider>
+    </BrowserRouter>
   );
 }
 

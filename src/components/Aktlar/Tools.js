@@ -1,14 +1,9 @@
 import React from "react";
-import { useDispatch } from "react-redux";
-import { show } from "../../app/reducers/showHideSlice";
 import ExcelSvg from "../../assets/excel.svg";
 import { Button } from "@mui/material";
 import CachedIcon from "@mui/icons-material/Cached";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
-import axios from "axios";
-import API from "../../utils/APIRouters";
 import { CSVLink } from "react-csv";
-import { useState } from "react";
 
 function Tools({
   fetchData,
@@ -25,7 +20,7 @@ function Tools({
         kod: data.kod,
         fish: data.fish,
         ogohlantirish: data.ogohlantirish_xati,
-        forma1: data.forma1.topildi ? "aniqlandi" : "noaniq",
+        forma1: data.forma1?.topildi ? "aniqlandi" : "noaniq",
         _id: data._id,
         status: data.status,
         qarzdorlik: data.qarzdorlik,
@@ -34,7 +29,6 @@ function Tools({
     return arr;
   };
 
-  const dispatch = useDispatch();
   return (
     <ul>
       <div className="accordion actions-panel">
@@ -76,7 +70,10 @@ function Tools({
               className="accordion-body text-bg-danger"
               data-bs-toggle=""
               data-bs-target=""
-              onClick={() => dispatch(show())}
+              onClick={() => {
+                // setShowModal(true)
+                // bu yerda modal oynani ko'rsatish uchun state dispatcher bo'lishi kerak edi. Bu bo'lim ishga tushishni boshlaganida yana yaratamiz
+              }}
             >
               O'chirish
             </div>
