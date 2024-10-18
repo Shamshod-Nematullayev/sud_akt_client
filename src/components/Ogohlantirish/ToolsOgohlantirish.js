@@ -6,7 +6,13 @@ import ImportModalOgohlantirish from "./ImportExcelModal";
 import UploadFilesModal from "./UploadFilesModal.ogohlantirish";
 import CachedIcon from "@mui/icons-material/Cached";
 
-function ToolsOgohlantirish({ handleChecked, fetchData }) {
+function ToolsOgohlantirish({
+  handleChecked,
+  fetchData,
+  page,
+  pageSize,
+  sortModel,
+}) {
   // const dispatch = useDispatch();
   return (
     <ul>
@@ -20,9 +26,14 @@ function ToolsOgohlantirish({ handleChecked, fetchData }) {
         >
           <CheckCircleOutlineIcon /> Ogohlantirilgan
         </Button>
-        <ImportModalOgohlantirish fetchData={fetchData} />
+        <ImportModalOgohlantirish
+          fetchData={() => fetchData(page, pageSize, sortModel)}
+        />
         <UploadFilesModal />
-        <Button variant="contained" onClick={fetchData}>
+        <Button
+          variant="contained"
+          onClick={() => fetchData(page, pageSize, sortModel)}
+        >
           <CachedIcon />
         </Button>
       </div>

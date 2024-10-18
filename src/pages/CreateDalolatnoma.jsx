@@ -138,6 +138,10 @@ const CreateDalolatnoma = () => {
             `Akt summasi yo'q, yashovchi soni ham o'zgartirilmayapti!`
           );
         }
+        if (isNaN(abonentData.prescribed_cnt)) {
+          setPrintButtonDisabled(false);
+          return toast.error(`Hozirgi kundagi yashovchi soni kiritilmadi!`);
+        }
         try {
           const respond = await axios.post(`${API.host}/api/arizalar/create`, {
             sana: Date.now(),

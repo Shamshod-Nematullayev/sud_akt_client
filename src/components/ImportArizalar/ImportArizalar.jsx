@@ -182,7 +182,9 @@ export default function ImportArizalar() {
         if (isNaN(ariza.aktSummasi)) ariza.aktSummasi = 0;
         setAmount(
           ariza.aktSummasi +
-            (ariza.next_prescribed_cnt - ariza.current_prescribed_cnt) *
+            (isNaN(ariza.next_prescribed_cnt - ariza.current_prescribed_cnt)
+              ? 0
+              : ariza.next_prescribed_cnt - ariza.current_prescribed_cnt) *
               4625 *
               diffMonth
         );
